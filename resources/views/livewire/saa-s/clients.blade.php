@@ -4,10 +4,30 @@
     </h4>
 
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">{{ __('Clients List') }}</h5>
-            <div class="d-flex align-items-center">
-                <input wire:model.live="searchTerm" type="text" class="form-control" placeholder="{{ __('Search Clients...') }}">
+        <div class="card-header border-bottom">
+            <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+                <div class="col-md-4">
+                    <h5 class="card-title mb-0">{{ __('Clients List') }}</h5>
+                </div>
+                <div class="col-md-8 text-end">
+                    <button wire:click="resetInputs" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientModal">
+                        <i class="ti ti-plus me-1"></i> {{ __('Add Client') }}
+                    </button>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                <div class="col-md-4">
+                    <select wire:model.live="filterStatus" class="form-select text-capitalize">
+                        <option value="">{{ __('Select Status') }}</option>
+                        <option value="active">{{ __('Active') }}</option>
+                        <option value="inactive">{{ __('Inactive') }}</option>
+                        <option value="suspended">{{ __('Suspended') }}</option>
+                        <option value="expired">{{ __('Expired') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-4 offset-md-4">
+                    <input wire:model.live="searchTerm" type="text" class="form-control" placeholder="{{ __('Search (Name, Email...)') }}">
+                </div>
             </div>
         </div>
         <div class="table-responsive text-nowrap">
@@ -58,7 +78,7 @@
                             </span>
                         </td>
                         <td>
-                            <span class="text-body">{{ $client->plan_id ? __('Plan ') . $client->plan_id : __('No Plan') }}</span>
+                            <span class="text-body">{{ $client->plan ? $client->plan->name : '-' }}</span>
                         </td>
                         <td>
                             <span class="badge rounded-pill bg-label-info">{{ $client->companies_count }}</span>
@@ -72,7 +92,7 @@
                         <td colspan="6" class="text-center">
                             <div class="mt-4 mb-4">
                                 <h5 class="mb-1">{{ __('No Clients Found') }}</h5>
-                                <p class="text-muted">{{ __('Try adjusting your search or add a new client.') }}</p>
+                                <p class="text-muted">{{ __('Try adjusting your search or filters.') }}</p>
                             </div>
                         </td>
                     </tr>
@@ -82,6 +102,62 @@
         </div>
         <div class="card-footer">
             {{ $clients->links() }}
+        </div>
+    </div>
+
+    <!-- Create Client Modal -->
+    <div wire:ignore.self class="modal fade" id="createClientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3 p-md-5">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <h3 class="mb-2">{{ __('Add New Client') }}</h3>
+                        <p class="text-muted">{{ __('Provide details to create a new client.') }}</p>
+                    </div>
+                    <form wire:submit.prevent="store" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">{{ __('Client Name') }}</label>
+                            <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('شركة النخبة للتقنية') }}">
+                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ __('Email') }}</label>
+                            <input wire:model="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="{{ __('info@nokhba.sa') }}">
+                            @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ __('Phone') }}</label>
+                            <input wire:model="phone" type="text" class="form-control @error('phone') is-invalid @enderror" placeholder="{{ __('+966 5X XXX XXXX') }}">
+                            @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ __('Status') }}</label>
+                            <select wire:model="status" class="form-select @error('status') is-invalid @enderror">
+                                <option value="active">{{ __('Active') }}</option>
+                                <option value="inactive">{{ __('Inactive') }}</option>
+                                <option value="suspended">{{ __('Suspended') }}</option>
+                                <option value="expired">{{ __('Expired') }}</option>
+                            </select>
+                            @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ __('Subscription Plan') }}</label>
+                            <select wire:model="plan_id" class="form-select @error('plan_id') is-invalid @enderror">
+                                <option value="">{{ __('Select Plan') }}</option>
+                                @foreach($plans as $plan)
+                                    <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('plan_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-primary me-sm-3 me-1">{{ __('Submit') }}</button>
+                            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancel') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
