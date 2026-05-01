@@ -28,4 +28,14 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function managers(): HasMany
+    {
+        return $this->hasMany(CompanyManager::class);
+    }
+
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
 }
