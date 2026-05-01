@@ -21,6 +21,7 @@ use App\Livewire\HumanResource\Structure\Positions;
 use App\Livewire\MaintenanceMode;
 use App\Livewire\Misc\ComingSoon;
 use App\Livewire\SaaS\ClientDashboard;
+use App\Livewire\SaaS\Clients;
 use App\Livewire\SaaS\SuperAdminDashboard;
 use App\Livewire\Settings\Users;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,7 @@ Route::middleware([
     // 👉 Super Admin Routes
     Route::group(['prefix' => 'super-admin', 'middleware' => ['role_redirect:super_admin']], function () {
         Route::get('/dashboard', SuperAdminDashboard::class)->name('super-admin.dashboard');
+        Route::get('/clients', Clients::class)->name('super-admin-clients');
     });
 
     // 👉 Client Routes
