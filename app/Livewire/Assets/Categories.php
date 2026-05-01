@@ -34,7 +34,10 @@ class Categories extends Component
 
     public function mount()
     {
-        $this->showCategoryInfo(1);
+        $firstCategory = Category::first();
+        if ($firstCategory) {
+            $this->showCategoryInfo($firstCategory->id);
+        }
     }
 
     public function render()

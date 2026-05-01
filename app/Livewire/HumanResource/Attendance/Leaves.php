@@ -69,18 +69,32 @@ class Leaves extends Component
     public function mount()
     {
         $this->selectedEmployeeId = Auth::user()->employee_id;
-        $this->selectedEmployee = Employee::find(Auth::user()->employee_id);
+
+        if (! $this->selectedEmployeeId) {
+            $firstEmployee = Employee::first();
+            $this->selectedEmployeeId = $firstEmployee ? $firstEmployee->id : null;
+        }
+
+        $this->selectedEmployee = Employee::find($this->selectedEmployeeId);
 
         $this->leaveTypes = Leave::all();
 
-        $user = Employee::find(Auth::user()->employee_id);
-        $center = Center::find(
-            $user
-                ->timelines()
+        if ($this->selectedEmployee) {
+            $timeline = $this->selectedEmployee->timelines()
                 ->where('end_date', null)
-                ->first()->center_id
-        );
-        $this->activeEmployees = $center->activeEmployees();
+                ->first();
+
+            if ($timeline) {
+                $center = Center::find($timeline->center_id);
+                if ($center) {
+                    $this->activeEmployees = $center->activeEmployees();
+                }
+            }
+        }
+
+        if (empty($this->activeEmployees)) {
+            $this->activeEmployees = Employee::all();
+        }
 
         $currentDate = Carbon::now();
         $previousMonth = $currentDate->copy()->subMonth();
@@ -100,39 +114,38 @@ class Leaves extends Component
     {
         $this->selectedEmployee = Employee::find($this->selectedEmployeeId);
 
+        if (! $this->selectedEmployee) {
+            return EmployeeLeave::whereRaw('1 = 0')->paginate(7);
+        }
+
         $this->selectedLeave = Leave::find($this->selectedLeaveId);
 
         if ($this->dateRange) {
             $dates = explode(' to ', $this->dateRange);
 
-            $this->fromDate = $dates[0];
-            $this->toDate = $dates[1];
+            if (count($dates) == 2) {
+                $this->fromDate = $dates[0];
+                $this->toDate = $dates[1];
+            }
         }
 
-        if (
-            auth()
-                ->user()
-                ->hasAnyRole(['Admin', 'HR'])
-        ) {
-            // Return filtered leaves
-            return Employee::find($this->selectedEmployeeId)
-                ->leaves()
-                ->when($this->selectedLeaveId, function ($query) {
-                    return $query->where('leaves.id', $this->selectedLeaveId);
-                })
-                ->whereBetween('from_date', [$this->fromDate, $this->toDate])
-                ->orderBy('from_date')
-                ->paginate(7);
-        }
-
-        // Return filtered leaves
-        return Employee::find($this->selectedEmployeeId)
+        $query = $this->selectedEmployee
             ->leaves()
             ->when($this->selectedLeaveId, function ($query) {
                 return $query->where('leaves.id', $this->selectedLeaveId);
             })
-            ->whereBetween('from_date', [$this->fromDate, $this->toDate])
-            ->where('is_checked', 0)
+            ->whereBetween('from_date', [$this->fromDate, $this->toDate]);
+
+        if (
+            auth()
+                ->user()
+                ->hasRole('company')
+        ) {
+            return $query->orderBy('from_date')->paginate(7);
+        }
+
+        // Return filtered leaves
+        return $query->where('is_checked', 0)
             ->orderBy('from_date')
             ->paginate(7);
     }
@@ -324,17 +337,27 @@ class Leaves extends Component
     public function exportToExcel()
     {
         $user = Employee::find(Auth::user()->employee_id);
-        $center = Center::find(
-            $user
-                ->timelines()
-                ->where('end_date', null)
-                ->first()->center_id
-        );
-        $this->activeEmployees = $center->activeEmployees();
+        $centerEmployees = [];
 
-        $centerEmployees = array_map(function ($object) {
-            return $object['id'];
-        }, $this->activeEmployees->toArray());
+        if ($user) {
+            $timeline = $user->timelines()
+                ->where('end_date', null)
+                ->first();
+
+            if ($timeline) {
+                $center = Center::find($timeline->center_id);
+                if ($center) {
+                    $this->activeEmployees = $center->activeEmployees();
+                    $centerEmployees = array_map(function ($object) {
+                        return $object['id'];
+                    }, $this->activeEmployees->toArray());
+                }
+            }
+        }
+
+        if (empty($centerEmployees)) {
+            $centerEmployees = Employee::pluck('id')->toArray();
+        }
 
         $firstName = explode(' ', Auth::user()->name)[0];
 

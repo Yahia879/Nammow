@@ -84,7 +84,7 @@ class Dashboard extends Component
                 ->whereNull('end_date')
                 ->with('employee')
                 ->get() : collect();
-        } elseif (Auth::user()->hasRole('company|super_admin|client|Admin|HR')) {
+        } elseif (Auth::user()->hasAnyRole(['company', 'super_admin', 'client'])) {
             // For administrative roles, if a center is found, show its employees, otherwise show none
             $this->activeEmployees = $center ? $center->activeEmployees() : collect();
         } else {
@@ -149,7 +149,7 @@ class Dashboard extends Component
                 ])
                 ->orderBy('created_at')
                 ->get();
-        } elseif (Auth::user()->hasRole('company|super_admin|client|Admin|HR')) {
+        } elseif (Auth::user()->hasAnyRole(['company', 'super_admin', 'client'])) {
             $this->leaveRecords = EmployeeLeave::where('created_by', Auth::user()->name)
                 ->whereDate('created_at', Carbon::today()->toDate())
                 ->orderBy('created_at')
@@ -398,7 +398,7 @@ class Dashboard extends Component
         if (
             ! auth()
                 ->user()
-                ->hasRole('company|super_admin|client|Admin|HR')
+                ->hasAnyRole(['company', 'super_admin', 'client'])
         ) {
             abort(403, 'Unauthorized action.');
         }

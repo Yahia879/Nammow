@@ -77,7 +77,7 @@
           <div class="navbar-nav d-flex flex-row align-items-center">
 
             <!-- Maintenance -->
-            @if(Auth::check() && (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('HR')))
+            @if(Auth::check() && Auth::user()->hasAnyRole(['super_admin', 'company']))
             <div>
               @if ($isMaintenance == 1)
                 <a wire:click.prevent='turnMaintenanceModeOff()' href=''>

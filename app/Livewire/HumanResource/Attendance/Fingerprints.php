@@ -61,6 +61,11 @@ class Fingerprints extends Component
         $this->employees = Employee::all();
 
         $this->selectedEmployeeId = Auth::user()->employee_id;
+
+        if (! $this->selectedEmployeeId && count($this->employees) > 0) {
+            $this->selectedEmployeeId = $this->employees->first()->id;
+        }
+
         $this->selectedEmployee = Employee::find($this->selectedEmployeeId);
 
         $currentDate = Carbon::now();
@@ -86,8 +91,14 @@ class Fingerprints extends Component
         if ($this->dateRange) {
             $dates = explode(' to ', $this->dateRange);
 
-            $this->fromDate = $dates[0];
-            $this->toDate = $dates[1];
+            if (count($dates) == 2) {
+                $this->fromDate = $dates[0];
+                $this->toDate = $dates[1];
+            }
+        }
+
+        if (! $this->selectedEmployee) {
+            return Fingerprint::whereRaw('1 = 0')->paginate(7);
         }
 
         // Return filtered fingerprints
@@ -220,6 +231,12 @@ class Fingerprints extends Component
 
     public function exportToExcel()
     {
+        if (! $this->selectedEmployee) {
+            $this->dispatch('toastr', type: 'error', message: __('Please select an employee first.'));
+
+            return null;
+        }
+
         $fingerprints = Fingerprint::filteredFingerprints(
             $this->selectedEmployee->id,
             $this->fromDate,

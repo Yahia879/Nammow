@@ -99,15 +99,15 @@
                     <i class="ti ti-menu-2 ti-sm"></i>
                   </a>
                   <div class="flex-shrink-0 avatar">
-                    <img src="{{ Storage::disk("public")->url($selectedEmployee->profile_photo_path) }}" class="rounded-circle" alt="Avatar">
+                    <img src="{{ ($selectedEmployee && Storage::disk("public")->exists($selectedEmployee->profile_photo_path)) ? Storage::disk("public")->url($selectedEmployee->profile_photo_path) : Storage::disk("public")->url('profile-photos/.default-photo.jpg') }}" class="rounded-circle" alt="Avatar">
                   </div>
                   <div class="chat-contact-info flex-grow-1 ms-2">
-                    <h6 class="m-0">{{ $selectedEmployee->full_name }}</h6>
-                    <small class="user-status text-muted">{{ $selectedEmployee->current_position }}</small>
+                    <h6 class="m-0">{{ $selectedEmployee->full_name ?? __('Select Employee') }}</h6>
+                    <small class="user-status text-muted">{{ $selectedEmployee->current_position ?? '---' }}</small>
                   </div>
                 </div>
                 <div class="col-5 btn-group d-flex justify-content-end">
-                  <button wire:click.prevent='showCreateLeaveModal' type="button" class="btn btn-primary"
+                  <button {{ $selectedEmployee ? "" : "disabled" }} wire:click.prevent='showCreateLeaveModal' type="button" class="btn btn-primary"
                           data-bs-toggle="modal" data-bs-target="#leaveModal">
                     <span class="ti ti-plus me-1"></span>{{ __('Add New Record') }}
                   </button>

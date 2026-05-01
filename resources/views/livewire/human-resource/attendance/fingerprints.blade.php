@@ -87,16 +87,16 @@
                     <i class="ti ti-menu-2 ti-sm"></i>
                   </a>
                   <div class="flex-shrink-0 avatar">
-                    <img src="{{ Storage::disk("public")->exists($selectedEmployee->profile_photo_path) ? Storage::disk("public")->url($selectedEmployee->profile_photo_path) : Storage::disk("public")->url('profile-photos/.default-photo.jpg') }}" class="rounded-circle" alt="Avatar">
+                    <img src="{{ ($selectedEmployee && Storage::disk("public")->exists($selectedEmployee->profile_photo_path)) ? Storage::disk("public")->url($selectedEmployee->profile_photo_path) : Storage::disk("public")->url('profile-photos/.default-photo.jpg') }}" class="rounded-circle" alt="Avatar">
                   </div>
                   <div class="chat-contact-info flex-grow-1 ms-2">
-                    <h6 class="m-0">{{ $selectedEmployee->full_name }}</h6>
-                    <small class="user-status text-muted">{{ $selectedEmployee->current_position }}</small>
+                    <h6 class="m-0">{{ $selectedEmployee->full_name ?? __('Select Employee') }}</h6>
+                    <small class="user-status text-muted">{{ $selectedEmployee->current_position ?? '---' }}</small>
                   </div>
                 </div>
 
                 <div class="col-5 btn-group d-flex justify-content-end">
-                  <button {{ Auth::user()->hasRole('Admin') ? "" : "disabled" }}  wire:click.prevent='showNewFingerprintModal' type="button" class="btn btn-primary waves-effect waves-light"
+                  <button {{ (Auth::user()->hasAnyRole(['super_admin', 'company']) && $selectedEmployee) ? "" : "disabled" }}  wire:click.prevent='showNewFingerprintModal' type="button" class="btn btn-primary waves-effect waves-light"
                           data-bs-toggle="offcanvas" data-bs-target="#addRecordSidebar" aria-controls="addRecordSidebar"><i
                           class="ti ti-plus me-1"></i> {{ __('Add New Record') }}
                   </button>

@@ -68,25 +68,25 @@ Route::middleware([
     });
 
     // 👉 Dashboard
-    Route::group(['middleware' => ['role:Admin|AM|CC|CR|HR|Employee|Viewer|super_admin|client|company|employee']], function () {
+    Route::group(['middleware' => ['role:super_admin|client|company|employee']], function () {
         Route::redirect('/', '/home');
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
     });
 
     // 👉 Human Resource
-    Route::group(['middleware' => ['role:Admin|HR']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::prefix('attendance')->group(function () {
             Route::get('/fingerprints', Fingerprints::class)->name('attendance-fingerprints');
         });
     });
 
-    Route::group(['middleware' => ['role:Admin|HR|CC']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::prefix('attendance')->group(function () {
             Route::get('/leaves', Leaves::class)->name('attendance-leaves');
         });
     });
 
-    Route::group(['middleware' => ['role:Admin|HR']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::prefix('structure')->group(function () {
             Route::get('/centers', Centers::class)->name('structure-centers');
             Route::get('/departments', Departments::class)->name('structure-departments');
@@ -98,23 +98,23 @@ Route::middleware([
 
     Route::prefix('messages')->group(function () {
         Route::get('/bulk', Bulk::class)
-            ->middleware('role:Admin|HR|CC')
+            ->middleware('role:company')
             ->name('messages-bulk');
         Route::get('/personal', Personal::class)
-            ->middleware('role:Admin|HR')
+            ->middleware('role:company')
             ->name('messages-personal');
     });
 
-    Route::group(['middleware' => ['role:Admin|HR']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::get('/discounts', Discounts::class)->name('discounts');
         Route::get('/holidays', Holidays::class)->name('holidays');
     });
 
-    Route::group(['middleware' => ['role:Admin|HR']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::get('/statistics', Statistics::class)->name('statistics');
     });
 
-    Route::group(['middleware' => ['role:Admin']], function () {
+    Route::group(['middleware' => ['role:super_admin|client']], function () {
         Route::prefix('settings')->group(function () {
             Route::get('/users', Users::class)->name('settings-users');
             Route::get('/roles', ComingSoon::class)->name('settings-roles');
@@ -123,12 +123,12 @@ Route::middleware([
     });
 
     // 👉 Assets
-    Route::group(['middleware' => ['role:Admin|AM']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::get('/assets/inventory', Inventory::class)->name('inventory');
         Route::get('/assets/categories', Categories::class)->name('categories');
         // Route::get('/assets/transfers', ComingSoon::class)->name('transfers');
     });
-    Route::group(['middleware' => ['role:Admin|AM|HR']], function () {
+    Route::group(['middleware' => ['role:company']], function () {
         Route::get('/assets/reports', ComingSoon::class)->name('reports');
     });
 
