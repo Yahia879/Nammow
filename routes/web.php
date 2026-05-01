@@ -57,6 +57,7 @@ Route::middleware([
     // 👉 Client Routes
     Route::group(['prefix' => 'client', 'middleware' => ['role_redirect:client']], function () {
         Route::get('/dashboard', ClientDashboard::class)->name('client.dashboard');
+        Route::get('/companies', \App\Livewire\SaaS\Companies::class)->name('client.companies');
     });
 
     // 👉 Company Routes
