@@ -26,6 +26,11 @@
   <ul class="menu-inner py-1">
     @foreach ($menuData->menu as $menu)
 
+    {{-- Role-based filtering --}}
+    @if (isset($menu->role) && !auth()->user()->hasAnyRole($menu->role))
+      @continue
+    @endif
+
     {{-- adding active and open class if child is active --}}
 
     {{-- menu headers --}}

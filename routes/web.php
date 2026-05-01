@@ -21,8 +21,6 @@ use App\Livewire\HumanResource\Structure\Positions;
 use App\Livewire\MaintenanceMode;
 use App\Livewire\Misc\ComingSoon;
 use App\Livewire\SaaS\ClientDashboard;
-use App\Livewire\SaaS\CompanyDashboard;
-use App\Livewire\SaaS\EmployeeDashboard;
 use App\Livewire\SaaS\SuperAdminDashboard;
 use App\Livewire\Settings\Users;
 use Illuminate\Support\Facades\Route;
@@ -61,12 +59,12 @@ Route::middleware([
 
     // 👉 Company Routes
     Route::group(['prefix' => 'company', 'middleware' => ['role_redirect:company']], function () {
-        Route::get('/dashboard', CompanyDashboard::class)->name('company.dashboard');
+        Route::get('/dashboard', Dashboard::class)->name('company.dashboard');
     });
 
     // 👉 Employee Routes
     Route::group(['prefix' => 'employee', 'middleware' => ['role_redirect:employee']], function () {
-        Route::get('/dashboard', EmployeeDashboard::class)->name('employee.dashboard');
+        Route::get('/dashboard', Dashboard::class)->name('employee.dashboard');
     });
 
     // 👉 Dashboard

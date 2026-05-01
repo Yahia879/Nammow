@@ -1,7 +1,12 @@
 <ul class="menu-sub">
   @if (isset($menu))
     @foreach ($menu as $submenu)
-    @if ($role === 'Admin' || isset($submenu->role) && in_array($role, $submenu->role))
+
+    {{-- Role-based filtering --}}
+    @if (isset($submenu->role) && !auth()->user()->hasAnyRole($submenu->role))
+      @continue
+    @endif
+
     {{-- active menu method --}}
     @php
       $activeClass = null;
@@ -40,7 +45,6 @@
           @include('layouts.sections.menu.submenu',['menu' => $submenu->submenu])
         @endif
       </li>
-    @endif
     @endforeach
   @endif
 </ul>

@@ -65,10 +65,12 @@
         <div class="card-header">
           <div class="d-flex justify-content-between mb-3">
             <div class="card-title mb-0">
-              <h4 class="card-title mb-1">{{ __('Hi,') }} {{ Employee::find(Auth::user()->employee_id)->first_name }}! 👋</h4>
+              <h4 class="card-title mb-1">{{ __('Hi,') }} {{ $employee->first_name ?? Auth::user()->name }}! 👋</h4>
               <small class="text-muted">{{ __('Start your day with a smile') }}</small>
             </div>
+            @if(Auth::user()->employee_id)
             <small class="text-muted">{{ __('ID: ') . Auth::user()->employee_id }}</small>
+            @endif
           </div>
         </div>
 
@@ -81,7 +83,7 @@
               {{-- <h5 wire:poll.60s class="text-primary mt-3 mb-2">{{ now()->format('Y/m/d - H:i') }}</h5> --}}
               <h5 id="date" class="text-primary mt-3 mb-1"></h5>
               <h5 id="time" class="text-primary mb-2"></h5>
-              @if(!Auth::user()->hasRole('Employee|Viewer'))
+              @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
               <div class="btn-group dropend">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
                   aria-haspopup="true" aria-expanded="false"><i class="ti ti-menu-2 ti-xs me-1"></i>{{ __('Add New')
@@ -173,7 +175,7 @@
         @if($showStatictics)
           <div class="card-body pt-0">
             <div class="row gy-3">
-              @if(!Auth::user()->hasRole('Employee|Viewer'))
+              @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
               <div class="col-md-3 col-6">
                 <div class="d-flex align-items-center">
                   <div class="badge rounded-pill bg-label-primary me-3 p-2"><i class="ti ti-users ti-sm"></i></div>
@@ -193,6 +195,7 @@
                   </div>
                 </div>
               </div> --}}
+              @if($employee)
               <div class="col-md-3 col-6">
                 <div class="d-flex align-items-center">
                   <div class="badge rounded-pill bg-label-warning me-3 p-2"><i class="ti ti-zzz ti-sm"></i></div>
@@ -220,6 +223,7 @@
                   </div>
                 </div>
               </div>
+              @endif
             </div>
           </div>
         @endif
@@ -349,12 +353,12 @@
             <thead>
               <tr>
                 <th class="col-1">{{ __('ID') }}</th>
-                @if(!Auth::user()->hasRole('Employee|Viewer'))
+                @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
                 <th>{{ __('Employee') }}</th>
                 @endif
                 <th class="col-1">{{ __('Type') }}</th>
                 <th style="text-align: center">{{ __('Details') }}</th>
-                @if(!Auth::user()->hasRole('Employee|Viewer'))
+                @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
                 <th style="text-align: center">{{ __('Actions') }}</th>
                 @endif
               </tr>
@@ -363,7 +367,7 @@
               @forelse($leaveRecords as $leave)
               <tr>
                 <td><strong>{{ $leave->id }}</strong></td>
-                @if(!Auth::user()->hasRole('Employee|Viewer'))
+                @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
                 <td class="td">{{ $this->getEmployeeName($leave->employee_id) }}</td>
                 @endif
                 <td>{{ $this->getLeaveType($leave->leave_id) }}</td>
@@ -376,7 +380,7 @@
                     ' . Carbon::parse($leave->end_at)->format('H:i') }}</span>
                   @endif
                 </td>
-                @if(!Auth::user()->hasRole('Employee|Viewer'))
+                @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
                 <td style="text-align: center">
                   <button type="button"
                     class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect">
@@ -403,7 +407,7 @@
                     <p class="mb-4 mx-2">
                       {{ __('No leaves found, keep up the good work.') }}
                     </p>
-                    @if(!Auth::user()->hasRole('Employee|Viewer'))
+                    @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
                     <button class="btn btn-label-primary mb-4" data-bs-toggle="modal" data-bs-target="#leaveModal">
                       {{ __('Add New Leave') }}
                     </button>
@@ -425,7 +429,7 @@
 
   {{-- Discount dev Here --}}
 
-  @if(!Auth::user()->hasRole('Employee|Viewer'))
+  @if(Auth::user()->hasRole('company|super_admin|client|Admin|HR'))
     <div class="row mt-4">
       <div class="col">
         <div class="card">

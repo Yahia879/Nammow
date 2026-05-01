@@ -69,7 +69,8 @@ class Dashboard extends Component
 
     public function mount()
     {
-        $user = Employee::find(Auth::user()->employee_id);
+        $employeeId = Auth::user()->employee_id;
+        $user = $employeeId ? Employee::find($employeeId) : null;
 
         $this->employee = $user;
 
@@ -77,18 +78,21 @@ class Dashboard extends Component
         $center = $activeTimeline ? Center::find($activeTimeline->center_id) : null;
 
         // If the current user is an Employee, limit activeEmployees to only their timeline
-        if (Auth::user()->hasAnyRole(['Employee', 'Viewer'])) {
+        if (Auth::user()->hasRole('employee')) {
             // Return only the current employee's active timeline(s)
             $this->activeEmployees = $user ? Timeline::where('employee_id', $user->id)
                 ->whereNull('end_date')
                 ->with('employee')
                 ->get() : collect();
-        } else {
+        } elseif (Auth::user()->hasRole('company|super_admin|client|Admin|HR')) {
+            // For administrative roles, if a center is found, show its employees, otherwise show none
             $this->activeEmployees = $center ? $center->activeEmployees() : collect();
+        } else {
+            $this->activeEmployees = collect();
         }
 
-        $this->selectedEmployeeId = Auth::user()->employee_id;
-        $this->employeePhoto = $user->profile_photo_path;
+        $this->selectedEmployeeId = $employeeId;
+        $this->employeePhoto = $user->profile_photo_path ?? 'profile-photos/.default-photo.jpg';
 
         $this->leaveTypes = Leave::all();
 
@@ -135,7 +139,7 @@ class Dashboard extends Component
             'unsent' => Number::format($unsent ?? 0),
         ];
 
-        if (Auth::user()->hasAnyRole(['Employee', 'Viewer'])) {
+        if (Auth::user()->hasRole('employee')) {
             $this->leaveRecords = EmployeeLeave::where('employee_id', Auth::user()->employee_id)
                 ->whereBetween('created_at', [
                     Carbon::now()
@@ -145,11 +149,13 @@ class Dashboard extends Component
                 ])
                 ->orderBy('created_at')
                 ->get();
-        } else {
+        } elseif (Auth::user()->hasRole('company|super_admin|client|Admin|HR')) {
             $this->leaveRecords = EmployeeLeave::where('created_by', Auth::user()->name)
                 ->whereDate('created_at', Carbon::today()->toDate())
                 ->orderBy('created_at')
                 ->get();
+        } else {
+            $this->leaveRecords = collect();
         }
 
         return view('livewire.dashboard');
@@ -348,12 +354,12 @@ class Dashboard extends Component
 
     public function getEmployeeName($id)
     {
-        return Employee::find($id)->FullName;
+        return Employee::find($id)?->FullName ?? __('Unknown');
     }
 
     public function getLeaveType($id)
     {
-        return Leave::find($id)->name;
+        return Leave::find($id)?->name ?? __('Unknown');
     }
 
     public function getEmployeeDiscounts()
@@ -392,7 +398,7 @@ class Dashboard extends Component
         if (
             ! auth()
                 ->user()
-                ->hasAnyRole(['Admin', 'HR', 'CC', 'CR', 'CR-S'])
+                ->hasRole('company|super_admin|client|Admin|HR')
         ) {
             abort(403, 'Unauthorized action.');
         }
