@@ -98,11 +98,11 @@
                                 ][$client->status] ?? 'primary';
                             @endphp
                             <span class="badge bg-label-{{ $statusClass }}">
-                                {{ ucfirst($client->status) }}
+                                {{ __($client->status) }}
                             </span>
                         </td>
                         <td>
-                            <span class="text-body">{{ $client->plan ? $client->plan->name : '-' }}</span>
+                            <span class="text-body">{{ $client->plan ? __($client->plan->name) : '-' }}</span>
                         </td>
                         <td>
                             <span class="badge rounded-pill bg-label-info">{{ $client->companies_count }}</span>
@@ -151,7 +151,7 @@
                 <div class="modal-body">
                     <div class="text-center mb-4">
                         <h3 class="mb-2">{{ $isEdit ? __('Edit Client') : __('Add New Client') }}</h3>
-                        <p class="text-muted">{{ __('Provide details to ' . ($isEdit ? 'update' : 'create') . ' the client.') }}</p>
+                        <p class="text-muted">{{ $isEdit ? __('Provide details to update the client.') : __('Provide details to create the client.') }}</p>
                     </div>
                     <form wire:submit.prevent="submit" class="row g-3">
                         <div class="col-12">
