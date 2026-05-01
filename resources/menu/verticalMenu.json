@@ -15,6 +15,13 @@
       "role": ["client"]
     },
     {
+      "url": "/client/companies",
+      "name": "Companies",
+      "icon": "menu-icon tf-icons ti ti-building",
+      "slug": "client-companies",
+      "role": ["client"]
+    },
+    {
       "url": "/company/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
@@ -140,32 +147,32 @@
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-adjustments-alt",
       "slug": "settings",
-      "role": ["super_admin", "client"],
+      "role": [],
       "submenu": [
         {
           "url": "settings/users",
           "name": "Users",
           "slug": "settings-users",
-          "role": ["super_admin", "client"]
+          "role": []
         },
         {
           "url": "settings/roles",
           "name": "Roles",
           "slug": "settings-roles",
-          "role": ["super_admin"]
+          "role": []
         },
         {
           "url": "settings/permissions",
           "name": "Permissions",
           "slug": "settings-permissions",
-          "role": ["super_admin"]
+          "role": []
         },
         {
           "url": "log-viewer",
           "name": "Logs",
           "slug": "settings-logs",
           "target": "_blank",
-          "role": ["super_admin"]
+          "role": []
         }
       ]
     },
