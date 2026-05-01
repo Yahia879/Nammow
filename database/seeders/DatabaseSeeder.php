@@ -15,11 +15,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            RoleSeeder::class,
             ContractsSeeder::class,
             EmployeesSeeder::class,
-
             AdminUserSeeder::class,
-
             CenterSeeder::class,
             DepartmentSeeder::class,
             PositionSeeder::class,
@@ -32,11 +31,10 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Create role
-        $adminRole = Role::create(['name' => 'Admin']);
-
-        // Assign role
+        // Assign super_admin role to the first user
         $admin = User::find(1);
-        $admin->assignRole($adminRole);
+        if ($admin) {
+            $admin->assignRole('super_admin');
+        }
     }
 }

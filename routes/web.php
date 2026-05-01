@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\language\LanguageController;
 use App\Livewire\Assets\Categories;
 use App\Livewire\Assets\Inventory;
@@ -19,6 +20,10 @@ use App\Livewire\HumanResource\Structure\Employees;
 use App\Livewire\HumanResource\Structure\Positions;
 use App\Livewire\MaintenanceMode;
 use App\Livewire\Misc\ComingSoon;
+use App\Livewire\SaaS\ClientDashboard;
+use App\Livewire\SaaS\CompanyDashboard;
+use App\Livewire\SaaS\EmployeeDashboard;
+use App\Livewire\SaaS\SuperAdminDashboard;
 use App\Livewire\Settings\Users;
 use Illuminate\Support\Facades\Route;
 
@@ -41,9 +46,32 @@ Route::middleware([
     'verified',
     'allow_admin_during_maintenance',
 ])->group(function () {
+    // 👉 Home Dispatcher
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // 👉 Super Admin Routes
+    Route::group(['prefix' => 'super-admin', 'middleware' => ['role_redirect:super_admin']], function () {
+        Route::get('/dashboard', SuperAdminDashboard::class)->name('super-admin.dashboard');
+    });
+
+    // 👉 Client Routes
+    Route::group(['prefix' => 'client', 'middleware' => ['role_redirect:client']], function () {
+        Route::get('/dashboard', ClientDashboard::class)->name('client.dashboard');
+    });
+
+    // 👉 Company Routes
+    Route::group(['prefix' => 'company', 'middleware' => ['role_redirect:company']], function () {
+        Route::get('/dashboard', CompanyDashboard::class)->name('company.dashboard');
+    });
+
+    // 👉 Employee Routes
+    Route::group(['prefix' => 'employee', 'middleware' => ['role_redirect:employee']], function () {
+        Route::get('/dashboard', EmployeeDashboard::class)->name('employee.dashboard');
+    });
+
     // 👉 Dashboard
-    Route::group(['middleware' => ['role:Admin|AM|CC|CR|HR|Employee|Viewer']], function () {
-        Route::redirect('/', '/dashboard');
+    Route::group(['middleware' => ['role:Admin|AM|CC|CR|HR|Employee|Viewer|super_admin|client|company|employee']], function () {
+        Route::redirect('/', '/home');
         Route::get('/dashboard', Dashboard::class)->name('dashboard');
     });
 
