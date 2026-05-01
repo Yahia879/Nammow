@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->belongsTo(Employee::class);
     }
 
+    public function companyManager(): HasOne
+    {
+        return $this->hasOne(CompanyManager::class);
+    }
+
     // 👉 Attributes
     public function getEmployeeFullNameAttribute()
     {

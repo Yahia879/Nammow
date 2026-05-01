@@ -20,6 +20,7 @@ class Employee extends Model
 
     protected $fillable = [
         'id',
+        'company_id',
         'contract_id',
         'first_name',
         'father_name',
@@ -41,6 +42,11 @@ class Employee extends Model
     ];
 
     // 👉 Links
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
     public function user(): HasOne
     {
         return $this->hasOne(User::class);
