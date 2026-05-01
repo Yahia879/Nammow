@@ -19,6 +19,7 @@ class Company extends Model
         'logo',
         'address',
         'status',
+        'is_active',
     ];
 
     public function client(): BelongsTo

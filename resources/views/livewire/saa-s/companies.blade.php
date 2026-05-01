@@ -1,4 +1,17 @@
 <div>
+    @section('page-style')
+    <style>
+        .btn-tr {
+            opacity: 0;
+        }
+
+        tr:hover .btn-tr {
+            display: inline-block;
+            opacity: 1;
+        }
+    </style>
+    @endsection
+
     <h4 class="fw-bold py-3 mb-4">
         <span class="text-muted fw-light">{{ __('Client Management') }} /</span> {{ __('Companies') }}
     </h4>
@@ -39,6 +52,7 @@
                         <th>{{ __('Address') }}</th>
                         <th>{{ __('Employees') }}</th>
                         <th>{{ __('Joined') }}</th>
+                        <th>{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -84,6 +98,16 @@
                         <td>
                             <span class="text-body">{{ $company->created_at->format('Y-m-d') }}</span>
                         </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <button wire:click="editCompany({{ $company->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect me-1" data-bs-toggle="modal" data-bs-target="#companyModal">
+                                    <i class="ti ti-pencil ti-sm"></i>
+                                </button>
+                                <button wire:click="confirmDelete({{ $company->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-danger waves-effect" data-bs-toggle="modal" data-bs-target="#deleteCompanyModal">
+                                    <i class="ti ti-trash ti-sm"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     @empty
                     <tr>
@@ -102,6 +126,29 @@
         </div>
     </div>
 
+    <!-- Delete Company Modal -->
+    <div wire:ignore.self class="modal fade" id="deleteCompanyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Delete Company') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="ti ti-alert-triangle text-warning ti-xl mb-3"></i>
+                        <p class="h5">{{ __('Are you sure you want to deactivate this company?') }}</p>
+                        <p class="text-muted">{{ __('This action will deactivate the company (soft delete).') }}</p>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button wire:click="deleteCompany({{ $confirmedId }})" type="button" class="btn btn-danger" data-bs-dismiss="modal">{{ __('Confirm Delete') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Create Company Modal -->
     <div wire:ignore.self class="modal fade" id="companyModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -109,10 +156,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body">
                     <div class="text-center mb-4">
-                        <h3 class="mb-2">{{ __('Add New Company') }}</h3>
-                        <p class="text-muted">{{ __('Provide details to create a new company.') }}</p>
+                        <h3 class="mb-2">{{ $isEdit ? __('Edit Company') : __('Add New Company') }}</h3>
+                        <p class="text-muted">{{ $isEdit ? __('Provide details to update the company.') : __('Provide details to create a new company.') }}</p>
                     </div>
-                    <form wire:submit.prevent="store" class="row g-3">
+                    <form wire:submit.prevent="submit" class="row g-3">
                         <div class="col-12">
                             <label class="form-label">{{ __('Company Name') }}</label>
                             <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('Company Name') }}">
