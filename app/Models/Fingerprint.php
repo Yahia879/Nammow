@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use App\Traits\CreatedUpdatedDeletedBy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,9 +14,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Fingerprint extends Model
 {
-    use CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
+    use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
-    protected $fillable = ['employee_id', 'date', 'log', 'check_in', 'check_out', 'is_checked', 'excuse'];
+    protected $fillable = ['company_id', 'employee_id', 'date', 'log', 'check_in', 'check_out', 'is_checked', 'excuse'];
 
     // 👉 Links
     public function employee(): BelongsTo

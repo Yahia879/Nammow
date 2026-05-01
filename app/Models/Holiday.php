@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use App\Traits\CreatedUpdatedDeletedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,9 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Holiday extends Model
 {
-    use CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
+    use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'from_date', 'to_date', 'note'];
+    protected $fillable = ['company_id', 'name', 'from_date', 'to_date', 'note'];
 
     // 👉 Links
     public function centers(): BelongsToMany
