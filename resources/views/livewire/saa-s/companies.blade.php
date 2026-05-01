@@ -50,7 +50,7 @@
                         <th>{{ __('Company') }}</th>
                         <th>{{ __('Status') }}</th>
                         <th>{{ __('Address') }}</th>
-                        <th>{{ __('Employees') }}</th>
+                        <th>{{ __('Managers') }}</th>
                         <th>{{ __('Joined') }}</th>
                         <th>{{ __('Actions') }}</th>
                     </tr>
@@ -93,7 +93,7 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge rounded-pill bg-label-info">{{ $company->employees_count ?? $company->employees()->count() }}</span>
+                            <span class="badge rounded-pill bg-label-info">{{ $company->managers_count }}</span>
                         </td>
                         <td>
                             <span class="text-body">{{ $company->created_at->format('Y-m-d') }}</span>
@@ -111,7 +111,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center">
+                        <td colspan="6" class="text-center">
                             <div class="mt-4 mb-4">
                                 <h5 class="mb-1">{{ __('No Companies Found') }}</h5>
                             </div>
@@ -149,9 +149,9 @@
         </div>
     </div>
 
-    <!-- Create Company Modal -->
+    <!-- Create/Edit Company Modal -->
     <div wire:ignore.self class="modal fade" id="companyModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content p-3 p-md-5">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body">
@@ -159,51 +159,141 @@
                         <h3 class="mb-2">{{ $isEdit ? __('Edit Company') : __('Add New Company') }}</h3>
                         <p class="text-muted">{{ $isEdit ? __('Provide details to update the company.') : __('Provide details to create a new company.') }}</p>
                     </div>
-                    <form wire:submit.prevent="submit" class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">{{ __('Company Name') }}</label>
-                            <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('Company Name') }}">
-                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">{{ __('Email') }}</label>
-                            <input wire:model="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="info@company.com">
-                            @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">{{ __('Phone') }}</label>
-                            <input wire:model="phone" type="text" class="form-control @error('phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX">
-                            @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">{{ __('Address') }}</label>
-                            <textarea wire:model="address" class="form-control @error('address') is-invalid @enderror" placeholder="{{ __('Address') }}"></textarea>
-                            @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">{{ __('Status') }}</label>
-                            <select wire:model="status" class="form-select @error('status') is-invalid @enderror">
-                                <option value="active">{{ __('Active') }}</option>
-                                <option value="inactive">{{ __('Inactive') }}</option>
-                            </select>
-                            @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">{{ __('Logo') }}</label>
-                            <input wire:model="logo" type="file" class="form-control @error('logo') is-invalid @enderror" accept="image/png, image/jpeg, image/webp">
-                            <div class="form-text">{{ __('Allowed formats: JPG, PNG, WEBP') }}</div>
-                            @error('logo') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                            @if ($logo && !$errors->has('logo'))
-                                <div class="mt-2 text-center">
-                                    <img src="{{ $logo->temporaryUrl() }}" width="100" class="rounded border">
+
+                    <div x-data="{ activeTab: @entangle('activeTab') }" class="nav-align-top mb-4">
+                        <ul class="nav nav-tabs justify-content-center mb-3" role="tablist">
+                            <li class="nav-item">
+                                <button x-on:click="activeTab = 'company-info'" type="button" class="nav-link" :class="{ 'active': activeTab === 'company-info' }" role="tab">
+                                    <i class="ti ti-building me-1"></i> {{ __('Company Info') }}
+                                    @if($errors->has('name') || $errors->has('email') || $errors->has('phone') || $errors->has('address') || $errors->has('status') || $errors->has('logo'))
+                                        <span class="badge badge-dot bg-danger"></span>
+                                    @endif
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button x-on:click="activeTab = 'managers'" type="button" class="nav-link" :class="{ 'active': activeTab === 'managers' }" role="tab">
+                                    <i class="ti ti-users me-1"></i> {{ __('Company Managers') }}
+                                    @if($errors->has('managers.*'))
+                                        <span class="badge badge-dot bg-danger"></span>
+                                    @endif
+                                </button>
+                            </li>
+                        </ul>
+                        <form wire:submit.prevent="submit">
+                            <div class="tab-content">
+                                <!-- Company Info Tab -->
+                                <div class="tab-pane fade" :class="{ 'show active': activeTab === 'company-info' }" id="navs-company-info" role="tabpanel">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label">{{ __('Company Name') }}</label>
+                                            <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('Company Name') }}">
+                                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <label class="form-label">{{ __('Email') }}</label>
+                                            <input wire:model="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="info@company.com">
+                                            @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <label class="form-label">{{ __('Phone') }}</label>
+                                            <input wire:model="phone" type="text" class="form-control @error('phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX">
+                                            @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">{{ __('Address') }}</label>
+                                            <textarea wire:model="address" class="form-control @error('address') is-invalid @enderror" placeholder="{{ __('Address') }}"></textarea>
+                                            @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">{{ __('Status') }}</label>
+                                            <select wire:model="status" class="form-select @error('status') is-invalid @enderror">
+                                                <option value="active">{{ __('Active') }}</option>
+                                                <option value="inactive">{{ __('Inactive') }}</option>
+                                            </select>
+                                            @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">{{ __('Logo') }}</label>
+                                            <input wire:model="logo" type="file" class="form-control @error('logo') is-invalid @enderror" accept="image/png, image/jpeg, image/webp">
+                                            <div class="form-text">{{ __('Allowed formats: JPG, PNG, WEBP') }}</div>
+                                            @error('logo') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                            @if ($logo && !$errors->has('logo'))
+                                                <div class="mt-2 text-center">
+                                                    <img src="{{ $logo->temporaryUrl() }}" width="100" class="rounded border">
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-                        </div>
-                        <div class="col-12 text-center mt-4">
-                            <button type="submit" class="btn btn-primary me-sm-3 me-1">{{ __('Submit') }}</button>
-                            <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancel') }}</button>
-                        </div>
-                    </form>
+
+                                <!-- Company Managers Tab -->
+                                <div class="tab-pane fade" :class="{ 'show active': activeTab === 'managers' }" id="navs-managers" role="tabpanel">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="mb-0">{{ __('Managers List') }}</h5>
+                                        @if(!$isEdit)
+                                        <button wire:click="addManager" type="button" class="btn btn-sm btn-outline-primary">
+                                            <i class="ti ti-plus me-1"></i> {{ __('Add Manager') }}
+                                        </button>
+                                        @endif
+                                    </div>
+
+                                    @foreach($managers as $index => $manager)
+                                    <div class="card border mb-3">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="mb-0">{{ __('Manager') }} #{{ $index + 1 }} @if($isEdit && isset($manager['is_existing'])) <span class="badge bg-label-info ms-2">{{ __('Existing') }}</span> @endif</h6>
+                                                @if(!$isEdit && count($managers) > 1)
+                                                <button wire:click="removeManager({{ $index }})" type="button" class="btn btn-sm btn-label-danger btn-icon">
+                                                    <i class="ti ti-x"></i>
+                                                </button>
+                                                @endif
+                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <label class="form-label">{{ __('Manager Name') }}</label>
+                                                    <input wire:model="managers.{{ $index }}.name" type="text" class="form-control @error('managers.' . $index . '.name') is-invalid @enderror" placeholder="{{ __('Manager Name') }}" {{ $isEdit ? 'readonly' : '' }}>
+                                                    @error('managers.' . $index . '.name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">{{ __('Manager Email') }}</label>
+                                                    <input wire:model="managers.{{ $index }}.email" type="email" class="form-control @error('managers.' . $index . '.email') is-invalid @enderror" placeholder="manager@company.com" {{ $isEdit ? 'readonly' : '' }}>
+                                                    @error('managers.' . $index . '.email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">{{ __('Manager Phone') }}</label>
+                                                    <input wire:model="managers.{{ $index }}.phone" type="text" class="form-control @error('managers.' . $index . '.phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX" {{ $isEdit ? 'readonly' : '' }}>
+                                                    @error('managers.' . $index . '.phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                                </div>
+                                                @if(!$isEdit)
+                                                <div class="col-md-6">
+                                                    <label class="form-label">{{ __('Password') }}</label>
+                                                    <input wire:model="managers.{{ $index }}.password" type="password" class="form-control @error('managers.' . $index . '.password') is-invalid @enderror" placeholder="············">
+                                                    @error('managers.' . $index . '.password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">{{ __('Confirm Password') }}</label>
+                                                    <input wire:model="managers.{{ $index }}.password_confirmation" type="password" class="form-control" placeholder="············">
+                                                </div>
+                                                @else
+                                                <div class="col-md-6">
+                                                    <label class="form-label">{{ __('Status') }}</label>
+                                                    <input wire:model="managers.{{ $index }}.status" type="text" class="form-control" readonly>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            </div>
+
+                            <div class="col-12 text-center mt-4">
+                                <button type="submit" class="btn btn-primary me-sm-3 me-1">{{ __('Submit') }}</button>
+                                <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancel') }}</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

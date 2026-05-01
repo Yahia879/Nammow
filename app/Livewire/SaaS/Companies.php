@@ -3,10 +3,14 @@
 namespace App\Livewire\SaaS;
 
 use App\Models\Company;
+use App\Models\User;
+use App\Models\CompanyManager;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class Companies extends Component
 {
@@ -28,12 +32,21 @@ class Companies extends Component
     public $logo;
     public $existingLogo;
 
+    // Multi-Manager properties
+    public $managers = [];
+    public $activeTab = 'company-info';
+
     public $isEdit = false;
     public $confirmedId;
 
+    public function mount()
+    {
+        $this->addManager();
+    }
+
     protected function rules()
     {
-        return [
+        $rules = [
             'name' => 'required|string|min:3',
             'email' => 'nullable|email',
             'phone' => 'nullable',
@@ -41,6 +54,49 @@ class Companies extends Component
             'status' => 'required|in:active,inactive',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
+
+        if (!$this->isEdit) {
+            foreach ($this->managers as $index => $manager) {
+                $rules["managers.{$index}.name"] = 'required|string|min:3';
+                $rules["managers.{$index}.email"] = 'required|email|unique:users,email|distinct';
+                $rules["managers.{$index}.phone"] = 'nullable';
+                $rules["managers.{$index}.password"] = 'required|min:8|confirmed';
+            }
+        }
+
+        return $rules;
+    }
+
+    protected function validationAttributes()
+    {
+        $attributes = [];
+        foreach ($this->managers as $index => $manager) {
+            $attributes["managers.{$index}.name"] = __('Manager Name') . ' (#' . ($index + 1) . ')';
+            $attributes["managers.{$index}.email"] = __('Manager Email') . ' (#' . ($index + 1) . ')';
+            $attributes["managers.{$index}.phone"] = __('Manager Phone') . ' (#' . ($index + 1) . ')';
+            $attributes["managers.{$index}.password"] = __('Manager Password') . ' (#' . ($index + 1) . ')';
+        }
+        return $attributes;
+    }
+
+    public function addManager()
+    {
+        $this->managers[] = [
+            'name' => '',
+            'email' => '',
+            'phone' => '',
+            'password' => '',
+            'password_confirmation' => '',
+        ];
+    }
+
+    public function removeManager($index)
+    {
+        unset($this->managers[$index]);
+        $this->managers = array_values($this->managers); // Re-index
+        if (count($this->managers) === 0) {
+            $this->addManager();
+        }
     }
 
     public function updatingSearchTerm()
@@ -55,8 +111,10 @@ class Companies extends Component
 
     public function resetInputs()
     {
-        $this->reset(['companyId', 'name', 'email', 'phone', 'address', 'status', 'logo', 'existingLogo', 'isEdit']);
+        $this->reset(['companyId', 'name', 'email', 'phone', 'address', 'status', 'logo', 'existingLogo', 'isEdit', 'managers', 'activeTab']);
         $this->status = 'active';
+        $this->activeTab = 'company-info';
+        $this->addManager();
     }
 
     public function showCreateCompanyModal()
@@ -71,7 +129,7 @@ class Companies extends Component
         $this->isEdit = true;
         $this->companyId = $id;
 
-        $company = Company::where('client_id', auth()->user()->client_id)->findOrFail($id);
+        $company = Company::where('client_id', auth()->user()->client_id)->with('managers.user')->findOrFail($id);
         
         $this->name = $company->name;
         $this->email = $company->email;
@@ -79,6 +137,23 @@ class Companies extends Component
         $this->address = $company->address;
         $this->status = $company->status;
         $this->existingLogo = $company->logo;
+
+        // Load existing managers
+        $this->managers = [];
+        foreach ($company->managers as $manager) {
+            $this->managers[] = [
+                'id' => $manager->id,
+                'name' => $manager->user->name ?? '',
+                'email' => $manager->user->email ?? '',
+                'phone' => $manager->user->mobile ?? '',
+                'status' => $manager->status,
+                'is_existing' => true,
+            ];
+        }
+
+        if (empty($this->managers)) {
+            $this->addManager();
+        }
     }
 
     public function submit()
@@ -90,25 +165,53 @@ class Companies extends Component
     {
         $this->validate();
 
-        $logoPath = null;
-        if ($this->logo) {
-            $logoPath = $this->logo->store('company-logos', 'public');
+        DB::beginTransaction();
+        try {
+            $logoPath = null;
+            if ($this->logo) {
+                $logoPath = $this->logo->store('company-logos', 'public');
+            }
+
+            $company = Company::create([
+                'client_id' => auth()->user()->client_id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'address' => $this->address,
+                'status' => $this->status,
+                'logo' => $logoPath,
+                'is_active' => true,
+            ]);
+
+            foreach ($this->managers as $managerData) {
+                $user = User::create([
+                    'name' => $managerData['name'],
+                    'email' => $managerData['email'],
+                    'mobile' => $managerData['phone'],
+                    'password' => Hash::make($managerData['password']),
+                    'client_id' => auth()->user()->client_id,
+                    'company_id' => $company->id,
+                ]);
+
+                // Assign role
+                $user->assignRole('company');
+
+                CompanyManager::create([
+                    'company_id' => $company->id,
+                    'user_id' => $user->id,
+                    'status' => 'active',
+                ]);
+            }
+
+            DB::commit();
+
+            $this->resetInputs();
+            $this->dispatch('closeModal', elementId: '#companyModal');
+            $this->dispatch('toastr', type: 'success', message: __('Company and managers created successfully!'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatch('toastr', type: 'error', message: __('Error: ') . $e->getMessage());
         }
-
-        Company::create([
-            'client_id' => auth()->user()->client_id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'status' => $this->status,
-            'logo' => $logoPath,
-            'is_active' => true,
-        ]);
-
-        $this->resetInputs();
-        $this->dispatch('closeModal', elementId: '#companyModal');
-        $this->dispatch('toastr', type: 'success', message: __('Company created successfully!'));
     }
 
     public function update()
@@ -159,6 +262,7 @@ class Companies extends Component
     {
         $companies = Company::where('client_id', auth()->user()->client_id)
             ->where('is_active', true)
+            ->withCount('managers')
             ->where(function ($query) {
                 $query->where('name', 'like', '%'.$this->searchTerm.'%')
                     ->orWhere('email', 'like', '%'.$this->searchTerm.'%')
