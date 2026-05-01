@@ -151,6 +151,16 @@
                             </select>
                             @error('plan_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">{{ __('Password') }}</label>
+                            <input wire:model="password" type="password" class="form-control @error('password') is-invalid @enderror" placeholder="············">
+                            @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">{{ __('Confirm Password') }}</label>
+                            <input wire:model="password_confirmation" type="password" class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="············">
+                            @error('password_confirmation') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
                         <div class="col-12 text-center mt-4">
                             <button type="submit" class="btn btn-primary me-sm-3 me-1">{{ __('Submit') }}</button>
                             <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">{{ __('Cancel') }}</button>

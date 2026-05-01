@@ -3,6 +3,9 @@
 namespace App\Livewire\SaaS;
 
 use App\Models\Client;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -26,16 +29,21 @@ class Clients extends Component
 
     public $plan_id;
 
+    public $password;
+
+    public $password_confirmation;
+
     protected $paginationTheme = 'bootstrap';
 
     protected function rules()
     {
         return [
             'name' => 'required|min:3',
-            'email' => 'required|email|unique:clients,email',
+            'email' => 'required|email|unique:clients,email|unique:users,email',
             'status' => 'required|in:active,inactive,suspended,expired',
             'phone' => 'nullable',
             'plan_id' => 'nullable|integer',
+            'password' => 'required|min:8|confirmed',
         ];
     }
 
@@ -71,7 +79,7 @@ class Clients extends Component
 
     public function resetInputs()
     {
-        $this->reset(['name', 'email', 'phone', 'status', 'plan_id']);
+        $this->reset(['name', 'email', 'phone', 'status', 'plan_id', 'password', 'password_confirmation']);
         $this->status = 'active';
     }
 
@@ -79,17 +87,30 @@ class Clients extends Component
     {
         $this->validate();
 
-        Client::create([
-            'name' => $this->name,
-            'slug' => Str::slug($this->name),
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'status' => $this->status,
-            'plan_id' => $this->plan_id,
-        ]);
+        DB::transaction(function () {
+            $client = Client::create([
+                'name' => $this->name,
+                'slug' => Str::slug($this->name),
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'status' => $this->status,
+                'plan_id' => $this->plan_id,
+            ]);
+
+            $user = User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'username' => $this->email,
+                'password' => Hash::make($this->password),
+                'client_id' => $client->id,
+                'profile_photo_path' => 'profile-photos/.default-photo.jpg',
+            ]);
+
+            $user->assignRole('client');
+        });
 
         $this->resetInputs();
         $this->dispatch('closeModal', elementId: '#createClientModal');
-        $this->dispatch('toastr', type: 'success', message: __('Client created successfully!'));
+        $this->dispatch('toastr', type: 'success', message: __('Client and user account created successfully!'));
     }
 }
