@@ -18,7 +18,13 @@ class Client extends Model
         'phone',
         'status',
         'plan_id',
+        'is_active',
     ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 
     public function companies(): HasMany
     {

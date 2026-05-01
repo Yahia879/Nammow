@@ -18,7 +18,11 @@ class Clients extends Component
 
     public $filterStatus = '';
 
-    // Create Client Properties
+    public $filterIsActive = '1';
+
+    // Client Properties
+    public $clientId;
+
     public $name;
 
     public $email;
@@ -33,17 +37,21 @@ class Clients extends Component
 
     public $password_confirmation;
 
+    public $isEdit = false;
+
+    public $confirmedId;
+
     protected $paginationTheme = 'bootstrap';
 
     protected function rules()
     {
         return [
             'name' => 'required|min:3',
-            'email' => 'required|email|unique:clients,email|unique:users,email',
+            'email' => 'required|email|unique:clients,email,'.$this->clientId.'|unique:users,email,'.($this->clientId ? User::where('client_id', $this->clientId)->first()?->id : 'NULL'),
             'status' => 'required|in:active,inactive,suspended,expired',
             'phone' => 'nullable',
             'plan_id' => 'nullable|integer',
-            'password' => 'required|min:8|confirmed',
+            'password' => $this->isEdit ? 'nullable|min:8|confirmed' : 'required|min:8|confirmed',
         ];
     }
 
@@ -53,6 +61,11 @@ class Clients extends Component
     }
 
     public function updatingFilterStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterIsActive()
     {
         $this->resetPage();
     }
@@ -69,6 +82,9 @@ class Clients extends Component
             ->when($this->filterStatus, function ($query) {
                 return $query->where('status', $this->filterStatus);
             })
+            ->when($this->filterIsActive !== '', function ($query) {
+                return $query->where('is_active', $this->filterIsActive);
+            })
             ->paginate(10);
 
         return view('livewire.saa-s.clients', [
@@ -79,8 +95,33 @@ class Clients extends Component
 
     public function resetInputs()
     {
-        $this->reset(['name', 'email', 'phone', 'status', 'plan_id', 'password', 'password_confirmation']);
+        $this->reset(['clientId', 'name', 'email', 'phone', 'status', 'plan_id', 'password', 'password_confirmation', 'isEdit']);
         $this->status = 'active';
+    }
+
+    public function showCreateClientModal()
+    {
+        $this->resetInputs();
+        $this->isEdit = false;
+    }
+
+    public function editClient($id)
+    {
+        $this->resetInputs();
+        $this->isEdit = true;
+        $this->clientId = $id;
+
+        $client = Client::find($id);
+        $this->name = $client->name;
+        $this->email = $client->email;
+        $this->phone = $client->phone;
+        $this->status = $client->status;
+        $this->plan_id = $client->plan_id;
+    }
+
+    public function submit()
+    {
+        $this->isEdit ? $this->update() : $this->store();
     }
 
     public function store()
@@ -95,6 +136,7 @@ class Clients extends Component
                 'phone' => $this->phone,
                 'status' => $this->status,
                 'plan_id' => $this->plan_id,
+                'is_active' => true,
             ]);
 
             $user = User::create([
@@ -110,7 +152,58 @@ class Clients extends Component
         });
 
         $this->resetInputs();
-        $this->dispatch('closeModal', elementId: '#createClientModal');
+        $this->dispatch('closeModal', elementId: '#clientModal');
         $this->dispatch('toastr', type: 'success', message: __('Client and user account created successfully!'));
+    }
+
+    public function update()
+    {
+        $this->validate();
+
+        DB::transaction(function () {
+            $client = Client::find($this->clientId);
+            $client->update([
+                'name' => $this->name,
+                'slug' => Str::slug($this->name),
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'status' => $this->status,
+                'plan_id' => $this->plan_id,
+            ]);
+
+            $user = User::where('client_id', $this->clientId)->first();
+            if ($user) {
+                $userData = [
+                    'name' => $this->name,
+                    'email' => $this->email,
+                    'username' => $this->email,
+                ];
+
+                if ($this->password) {
+                    $userData['password'] = Hash::make($this->password);
+                }
+
+                $user->update($userData);
+            }
+        });
+
+        $this->resetInputs();
+        $this->dispatch('closeModal', elementId: '#clientModal');
+        $this->dispatch('toastr', type: 'success', message: __('Client updated successfully!'));
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->confirmedId = $id;
+    }
+
+    public function deleteClient($id)
+    {
+        $client = Client::find($id);
+        if ($client) {
+            $client->update(['is_active' => false]);
+            $this->dispatch('toastr', type: 'success', message: __('Client deactivated successfully!'));
+        }
+        $this->confirmedId = null;
     }
 }

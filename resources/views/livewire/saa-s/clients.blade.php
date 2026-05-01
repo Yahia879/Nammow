@@ -1,4 +1,17 @@
 <div>
+    @section('page-style')
+    <style>
+        .btn-tr {
+            opacity: 0;
+        }
+
+        tr:hover .btn-tr {
+            display: inline-block;
+            opacity: 1;
+        }
+    </style>
+    @endsection
+
     <h4 class="fw-bold py-3 mb-4">
         <span class="text-muted fw-light">SaaS /</span> {{ __('Clients') }}
     </h4>
@@ -10,13 +23,22 @@
                     <h5 class="card-title mb-0">{{ __('Clients List') }}</h5>
                 </div>
                 <div class="col-md-8 text-end">
-                    <button wire:click="resetInputs" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientModal">
+                    <button wire:click="showCreateClientModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientModal">
                         <i class="ti ti-plus me-1"></i> {{ __('Add Client') }}
                     </button>
                 </div>
             </div>
             <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('Visibility') }}</label>
+                    <select wire:model.live="filterIsActive" class="form-select">
+                        <option value="1">{{ __('Active Only') }}</option>
+                        <option value="0">{{ __('Inactive Only') }}</option>
+                        <option value="">{{ __('Show All') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('Status') }}</label>
                     <select wire:model.live="filterStatus" class="form-select text-capitalize">
                         <option value="">{{ __('Select Status') }}</option>
                         <option value="active">{{ __('Active') }}</option>
@@ -25,13 +47,14 @@
                         <option value="expired">{{ __('Expired') }}</option>
                     </select>
                 </div>
-                <div class="col-md-4 offset-md-4">
+                <div class="col-md-4 offset-md-2">
+                    <label class="form-label">{{ __('Search') }}</label>
                     <input wire:model.live="searchTerm" type="text" class="form-control" placeholder="{{ __('Search (Name, Email...)') }}">
                 </div>
             </div>
         </div>
         <div class="table-responsive text-nowrap">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>{{ __('Client') }}</th>
@@ -40,16 +63,17 @@
                         <th>{{ __('Plan') }}</th>
                         <th>{{ __('Companies') }}</th>
                         <th>{{ __('Joined') }}</th>
+                        <th>{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @forelse($clients as $client)
-                    <tr>
+                    <tr class="{{ $client->is_active ? '' : 'table-light' }}">
                         <td>
                             <div class="d-flex justify-content-start align-items-center user-name">
                                 <div class="avatar-wrapper">
                                     <div class="avatar avatar-sm me-3">
-                                        <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($client->name, 0, 2) }}</span>
+                                        <span class="avatar-initial rounded-circle bg-label-{{ $client->is_active ? 'primary' : 'secondary' }}">{{ substr($client->name, 0, 2) }}</span>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
@@ -86,10 +110,24 @@
                         <td>
                             <span class="text-body">{{ $client->created_at->format('Y-m-d') }}</span>
                         </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                @if($client->is_active)
+                                    <button wire:click="editClient({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect me-1" data-bs-toggle="modal" data-bs-target="#clientModal">
+                                        <i class="ti ti-pencil ti-sm"></i>
+                                    </button>
+                                    <button wire:click="confirmDelete({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-danger waves-effect" data-bs-toggle="modal" data-bs-target="#deleteClientModal">
+                                        <i class="ti ti-trash ti-sm"></i>
+                                    </button>
+                                @else
+                                    <span class="badge bg-label-secondary">{{ __('Deactivated') }}</span>
+                                @endif
+                            </div>
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center">
+                        <td colspan="7" class="text-center">
                             <div class="mt-4 mb-4">
                                 <h5 class="mb-1">{{ __('No Clients Found') }}</h5>
                                 <p class="text-muted">{{ __('Try adjusting your search or filters.') }}</p>
@@ -105,17 +143,17 @@
         </div>
     </div>
 
-    <!-- Create Client Modal -->
-    <div wire:ignore.self class="modal fade" id="createClientModal" tabindex="-1" aria-hidden="true">
+    <!-- Client Modal (Create/Edit) -->
+    <div wire:ignore.self class="modal fade" id="clientModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-3 p-md-5">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body">
                     <div class="text-center mb-4">
-                        <h3 class="mb-2">{{ __('Add New Client') }}</h3>
-                        <p class="text-muted">{{ __('Provide details to create a new client.') }}</p>
+                        <h3 class="mb-2">{{ $isEdit ? __('Edit Client') : __('Add New Client') }}</h3>
+                        <p class="text-muted">{{ __('Provide details to ' . ($isEdit ? 'update' : 'create') . ' the client.') }}</p>
                     </div>
-                    <form wire:submit.prevent="store" class="row g-3">
+                    <form wire:submit.prevent="submit" class="row g-3">
                         <div class="col-12">
                             <label class="form-label">{{ __('Client Name') }}</label>
                             <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('شركة النخبة للتقنية') }}">
@@ -154,6 +192,9 @@
                         <div class="col-12 col-md-6">
                             <label class="form-label">{{ __('Password') }}</label>
                             <input wire:model="password" type="password" class="form-control @error('password') is-invalid @enderror" placeholder="············">
+                            @if($isEdit)
+                                <small class="text-muted">{{ __('Leave blank to keep current password') }}</small>
+                            @endif
                             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-12 col-md-6">
@@ -170,4 +211,7 @@
             </div>
         </div>
     </div>
+
+    {{-- Modals --}}
+    @include('_partials/_modals/modal-delete-client')
 </div>
