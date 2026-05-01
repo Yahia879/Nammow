@@ -18,7 +18,7 @@ class Clients extends Component
 
     public $filterStatus = '';
 
-    public $filterIsActive = '1';
+    public $filterPlanId = '';
 
     // Client Properties
     public $clientId;
@@ -65,7 +65,7 @@ class Clients extends Component
         $this->resetPage();
     }
 
-    public function updatingFilterIsActive()
+    public function updatingFilterPlanId()
     {
         $this->resetPage();
     }
@@ -73,6 +73,7 @@ class Clients extends Component
     public function render()
     {
         $clients = Client::with(['plan'])->withCount('companies')
+            ->where('is_active', true)
             ->where(function ($query) {
                 $query->where('name', 'like', '%'.$this->searchTerm.'%')
                     ->orWhere('email', 'like', '%'.$this->searchTerm.'%')
@@ -82,8 +83,8 @@ class Clients extends Component
             ->when($this->filterStatus, function ($query) {
                 return $query->where('status', $this->filterStatus);
             })
-            ->when($this->filterIsActive !== '', function ($query) {
-                return $query->where('is_active', $this->filterIsActive);
+            ->when($this->filterPlanId, function ($query) {
+                return $query->where('plan_id', $this->filterPlanId);
             })
             ->paginate(10);
 

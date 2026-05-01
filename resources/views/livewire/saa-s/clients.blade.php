@@ -13,7 +13,7 @@
     @endsection
 
     <h4 class="fw-bold py-3 mb-4">
-        <span class="text-muted fw-light">SaaS /</span> {{ __('Clients') }}
+        <span class="text-muted fw-light">{{ __('Client Management') }} /</span> {{ __('Clients') }}
     </h4>
 
     <div class="card">
@@ -30,11 +30,12 @@
             </div>
             <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
                 <div class="col-md-3">
-                    <label class="form-label">{{ __('Visibility') }}</label>
-                    <select wire:model.live="filterIsActive" class="form-select">
-                        <option value="1">{{ __('Active Only') }}</option>
-                        <option value="0">{{ __('Inactive Only') }}</option>
-                        <option value="">{{ __('Show All') }}</option>
+                    <label class="form-label">{{ __('Subscription Plan') }}</label>
+                    <select wire:model.live="filterPlanId" class="form-select">
+                        <option value="">{{ __('All Plans') }}</option>
+                        @foreach($plans as $plan)
+                            <option value="{{ $plan->id }}">{{ __($plan->name) }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -68,12 +69,12 @@
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @forelse($clients as $client)
-                    <tr class="{{ $client->is_active ? '' : 'table-light' }}">
+                    <tr>
                         <td>
                             <div class="d-flex justify-content-start align-items-center user-name">
                                 <div class="avatar-wrapper">
                                     <div class="avatar avatar-sm me-3">
-                                        <span class="avatar-initial rounded-circle bg-label-{{ $client->is_active ? 'primary' : 'secondary' }}">{{ substr($client->name, 0, 2) }}</span>
+                                        <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($client->name, 0, 2) }}</span>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
@@ -112,16 +113,12 @@
                         </td>
                         <td>
                             <div class="d-flex align-items-center">
-                                @if($client->is_active)
-                                    <button wire:click="editClient({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect me-1" data-bs-toggle="modal" data-bs-target="#clientModal">
-                                        <i class="ti ti-pencil ti-sm"></i>
-                                    </button>
-                                    <button wire:click="confirmDelete({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-danger waves-effect" data-bs-toggle="modal" data-bs-target="#deleteClientModal">
-                                        <i class="ti ti-trash ti-sm"></i>
-                                    </button>
-                                @else
-                                    <span class="badge bg-label-secondary">{{ __('Deactivated') }}</span>
-                                @endif
+                                <button wire:click="editClient({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect me-1" data-bs-toggle="modal" data-bs-target="#clientModal">
+                                    <i class="ti ti-pencil ti-sm"></i>
+                                </button>
+                                <button wire:click="confirmDelete({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-danger waves-effect" data-bs-toggle="modal" data-bs-target="#deleteClientModal">
+                                    <i class="ti ti-trash ti-sm"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
