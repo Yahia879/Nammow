@@ -143,12 +143,12 @@
             <!-- Language -->
             <li class="nav-item dropdown-language dropdown me-2 me-xl-1">
               <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                <i class="fi fi-us fis rounded-circle me-1 fs-3"></i>
+                <i class="fi {{ App::getLocale() == 'ar' ? 'fi-sa' : 'fi-us' }} fis rounded-circle me-1 fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
                   <a class="dropdown-item {{ App::getLocale() == 'ar' ? 'selected' : '' }}" href="{{ url('lang/ar') }}" data-language="ar" data-text-direction="rtl">
-                    <i class="fi fi-sy fis rounded-circle me-1 fs-3"></i>
+                    <i class="fi fi-sa fis rounded-circle me-1 fs-3"></i>
                     <span class="align-middle">العربية</span>
                   </a>
                 </li>

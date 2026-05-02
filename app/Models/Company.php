@@ -14,9 +14,12 @@ class Company extends Model
     protected $fillable = [
         'client_id',
         'name',
+        'email',
+        'phone',
         'logo',
         'address',
         'status',
+        'is_active',
     ];
 
     public function client(): BelongsTo

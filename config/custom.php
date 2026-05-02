@@ -8,10 +8,10 @@
 return [
     'custom' => [
         'myLayout' => 'vertical', // Options[String]: vertical(default), horizontal
-        'myTheme' => 'theme-semi-dark', // Options[String]: theme-default(default), theme-bordered, theme-semi-dark
-        'myStyle' => 'dark', // Options[String]: light(default), dark
+        'myTheme' => 'theme-default', // Options[String]: theme-default(default), theme-bordered, theme-semi-dark
+        'myStyle' => 'light', // Options[String]: light(default), dark
         'myRTLSupport' => true, // options[Boolean]: true(default), false // To provide RTLSupport or not
-        'myRTLMode' => false, // options[Boolean]: false(default), true // To set layout to RTL layout  (myRTLSupport must be true for rtl mode)
+        'myRTLMode' => true, // options[Boolean]: false(default), true // To set layout to RTL layout  (myRTLSupport must be true for rtl mode)
         'hasCustomizer' => true, // options[Boolean]: true(default), false // Display customizer or not THIS WILL REMOVE INCLUDED JS FILE. SO LOCAL STORAGE WON'T WORK
         'displayCustomizer' => false, // options[Boolean]: true(default), false // Display customizer UI or not, THIS WON'T REMOVE INCLUDED JS FILE. SO LOCAL STORAGE WILL WORK
         'menuFixed' => true, // options[Boolean]: true(default), false // Layout(menu) Fixed

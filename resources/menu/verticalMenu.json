@@ -4,22 +4,43 @@
       "url": "/super-admin/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
-      "slug": "super-admin-dashboard",
+      "slug": "super-admin.dashboard",
       "role": ["super_admin"]
+    },
+    {
+      "name": "super_admin.client_management",
+      "icon": "menu-icon tf-icons ti ti-users",
+      "slug": "super-admin.",
+      "role": ["super_admin"],
+      "submenu": [
+        {
+          "url": "/super-admin/clients",
+          "name": "super_admin.clients",
+          "slug": "super-admin-clients",
+          "role": ["super_admin"]
+        }
+      ]
     },
     {
       "url": "/client/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
-      "slug": "client-dashboard",
+      "slug": "client.dashboard",
       "role": ["client"]
     },
     {
-      "url": "/client/companies",
-      "name": "Companies",
+      "name": "client.company_management",
       "icon": "menu-icon tf-icons ti ti-building",
-      "slug": "client-companies",
-      "role": ["client"]
+      "slug": "client.",
+      "role": ["client"],
+      "submenu": [
+        {
+          "url": "/client/companies",
+          "name": "client.companies",
+          "slug": "client.companies",
+          "role": ["client"]
+        }
+      ]
     },
     {
       "url": "/client/leaves",
@@ -104,25 +125,25 @@
     },
     {
       "menuHeader": "Human resource",
-      "role": ["company"]
+      "role": ["-company"]
     },
     {
       "name": "Attendance",
       "icon": "menu-icon tf-icons ti ti-door-exit",
       "slug": "attendance",
-      "role": ["company"],
+      "role": ["-company"],
       "submenu": [
         {
           "url": "attendance/fingerprints",
           "name": "Fingerprints",
           "slug": "attendance-fingerprints",
-          "role": ["company"]
+          "role": ["-company"]
         },
         {
           "url": "attendance/leaves",
           "name": "Legacy Leaves",
           "slug": "attendance-leaves",
-          "role": ["company"]
+          "role": ["-company"]
         }
       ]
     },
@@ -130,31 +151,31 @@
       "name": "Structure",
       "icon": "menu-icon tf-icons ti ti-hierarchy",
       "slug": "structure",
-      "role": ["company"],
+      "role": ["-company"],
       "submenu": [
         {
           "url": "structure/centers",
           "name": "Centers",
           "slug": "structure-centers",
-          "role": ["company"]
+          "role": ["-company"]
         },
         {
           "url": "structure/departments",
           "name": "Departments",
           "slug": "structure-departments",
-          "role": ["company"]
+          "role": ["-company"]
         },
         {
           "url": "structure/positions",
           "name": "Positions",
           "slug": "structure-positions",
-          "role": ["company"]
+          "role": ["-company"]
         },
         {
           "url": "structure/employees",
           "name": "Employees",
           "slug": "structure-employees",
-          "role": ["company"]
+          "role": ["-company"]
         }
       ]
     },
@@ -162,19 +183,19 @@
       "name": "Messages",
       "icon": "menu-icon tf-icons ti ti-message-dots",
       "slug": "messages",
-      "role": ["company"],
+      "role": ["-company"],
       "submenu": [
         {
           "url": "messages/bulk",
           "name": "Bulk",
           "slug": "messages-bulk",
-          "role": ["company"]
+          "role": ["-company"]
         },
         {
           "url": "messages/personal",
           "name": "Personal",
           "slug": "messages-personal",
-          "role": ["company"]
+          "role": ["-company"]
         }
       ]
     },
@@ -183,14 +204,14 @@
       "name": "Discounts",
       "icon": "menu-icon tf-icons ti ti-coin",
       "slug": "discounts",
-      "role": ["company"]
+      "role": ["-company"]
     },
     {
       "url": "/statistics",
       "name": "Statistics",
       "icon": "menu-icon tf-icons ti ti-device-desktop-analytics",
       "slug": "statistics",
-      "role": ["company"]
+      "role": ["-company"]
     },
     {
       "name": "Settings",
@@ -227,28 +248,28 @@
     },
     {
       "menuHeader": "Assets",
-      "role": ["company"]
+      "role": ["-company"]
     },
     {
       "url": "/assets/inventory",
       "name": "Inventory",
       "icon": "menu-icon tf-icons ti ti-barcode",
       "slug": "products",
-      "role": ["company"]
+      "role": ["-company"]
     },
     {
       "url": "/assets/categories",
       "name": "Categories",
       "icon": "menu-icon tf-icons ti ti-category",
       "slug": "categories",
-      "role": ["company"]
+      "role": ["-company"]
     },
     {
       "url": "/assets/reports",
       "name": "Reports",
       "icon": "menu-icon tf-icons ti ti-file-analytics",
       "slug": "reports",
-      "role": ["company"]
+      "role": ["-company"]
     }
   ]
 }

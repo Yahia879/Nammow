@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use App\Traits\CreatedUpdatedDeletedBy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -14,9 +15,9 @@ use Illuminate\Support\Facades\Auth;
 
 class Center extends Model
 {
-    use CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
+    use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'start_work_hour', 'end_work_hour', 'weekends'];
+    protected $fillable = ['company_id', 'name', 'start_work_hour', 'end_work_hour', 'weekends'];
 
     // 👉 Links
     public function timelines(): HasMany

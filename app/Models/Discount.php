@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use App\Traits\CreatedUpdatedDeletedBy;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -12,9 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Discount extends Model
 {
-    use CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
+    use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
-    protected $fillable = ['employee_id', 'rate', 'date', 'reason', 'is_auto', 'is_sent', 'batch'];
+    protected $fillable = ['company_id', 'employee_id', 'rate', 'date', 'reason', 'is_auto', 'is_sent', 'batch'];
 
     // 👉 Links
     public function employee(): BelongsTo
