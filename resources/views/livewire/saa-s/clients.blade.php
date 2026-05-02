@@ -181,7 +181,7 @@
                             <select wire:model="plan_id" class="form-select @error('plan_id') is-invalid @enderror">
                                 <option value="">{{ __('Select Plan') }}</option>
                                 @foreach($plans as $plan)
-                                    <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                    <option value="{{ $plan->id }}">{{ __($plan->name) }}</option>
                                 @endforeach
                             </select>
                             @error('plan_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
