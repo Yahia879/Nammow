@@ -21,7 +21,6 @@ class User extends Authenticatable
         HasApiTokens,
         HasFactory,
         HasProfilePhoto,
-        HasRoles,
         Notifiable,
         SoftDeletes,
         TwoFactorAuthenticatable;
@@ -38,6 +37,7 @@ class User extends Authenticatable
         'profile_photo_path',
         'client_id',
         'company_id',
+        'role_id',
     ];
 
     protected $hidden = ['password', 'remember_token', 'two_factor_recovery_codes', 'two_factor_secret'];
@@ -83,5 +83,45 @@ class User extends Authenticatable
         }
 
         return '';
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function actions()
+    {
+        return $this->belongsToMany(Action::class);
+    }
+
+    public function canAction($actionName)
+    {
+        $actions = is_array($actionName) ? $actionName : [$actionName];
+
+        // Check direct user actions
+        if ($this->actions()->whereIn('name', $actions)->exists()) {
+            return true;
+        }
+
+        // Check role actions
+        if ($this->role && $this->role->actions()->whereIn('name', $actions)->exists()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role && $this->role->name === $role;
+    }
+
+    public function hasAnyRole($roles)
+    {
+        if (!is_array($roles)) {
+            $roles = explode('|', $roles);
+        }
+        return $this->role && in_array($this->role->name, $roles);
     }
 }

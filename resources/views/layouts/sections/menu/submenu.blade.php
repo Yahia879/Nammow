@@ -3,7 +3,7 @@
     @foreach ($menu as $submenu)
 
     {{-- Role-based filtering --}}
-    @if (isset($submenu->role) && !auth()->user()->hasAnyRole($submenu->role))
+    @if (isset($submenu->action) && !auth()->user()->canAction($submenu->action))
       @continue
     @endif
 

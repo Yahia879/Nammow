@@ -149,7 +149,10 @@ class Clients extends Component
                 'profile_photo_path' => 'profile-photos/.default-photo.jpg',
             ]);
 
-            $user->assignRole('client');
+            $clientRole = \App\Models\Role::where('name', 'client')->first();
+            if ($clientRole) {
+                $user->update(['role_id' => $clientRole->id]);
+            }
         });
 
         $this->resetInputs();

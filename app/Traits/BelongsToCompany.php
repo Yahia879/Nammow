@@ -14,7 +14,7 @@ trait BelongsToCompany
         static::creating(function ($model) {
             if (Auth::check()) {
                 $user = Auth::user();
-                $role = $user->getRoleNames()->first();
+                $role = $user->role->name ?? null;
 
                 if ($role === 'company') {
                     if (!$model->company_id) {

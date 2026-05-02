@@ -5,7 +5,6 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            ActionSeeder::class,
             RoleSeeder::class,
             PlanSeeder::class,
             ContractsSeeder::class,
@@ -38,7 +38,10 @@ class DatabaseSeeder extends Seeder
         // Assign super_admin role to the first user
         $admin = User::find(1);
         if ($admin) {
-            $admin->assignRole('super_admin');
+            $superAdminRole = \App\Models\Role::where('name', 'super_admin')->first();
+            if ($superAdminRole) {
+                $admin->update(['role_id' => $superAdminRole->id]);
+            }
         }
     }
 }

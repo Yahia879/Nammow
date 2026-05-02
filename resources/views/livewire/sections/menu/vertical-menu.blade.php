@@ -26,7 +26,7 @@
 
     <ul class="menu-inner py-1">
       @foreach ($menuData->menu as $menu)
-        @if ($role === 'Admin' || isset($menu->role) && in_array($role, $menu->role))
+        @if (!isset($menu->action) || auth()->user()->canAction($menu->action))
           {{-- adding active and open class if child is active --}}
 
           {{-- menu headers --}}

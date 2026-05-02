@@ -62,6 +62,9 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->string('scope'); // all, selected, single
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

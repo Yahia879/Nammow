@@ -15,7 +15,7 @@
 <!-- Error -->
 <div class="container-xxl container-p-y">
   <div class="misc-wrapper">
-    <h2 class="mb-1 mt-4">You are not authorized! 🔐</h2>
+    <h2 class="mb-1 mt-4">Access Forbidden! 🚫</h2>
     <p class="mb-4 mx-2">You don’t have permission to access this page. Go Home!</p>
     <a href="{{url('/')}}" class="btn btn-primary mb-4">Back to home</a>
     <div class="mt-4">

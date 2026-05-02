@@ -60,8 +60,7 @@ class Center extends Model
         if (
             in_array(
                 User::find(Auth::id())
-                    ?->getRoleNames()
-                    ->first(),
+                    ?->role?->name,
                 ['super_admin', 'company']
             )
         ) {

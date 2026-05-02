@@ -47,6 +47,9 @@ class TestEmployeeSeeder extends Seeder
             'employee_id' => $employee->id,
         ]);
 
-        $user->assignRole('employee');
+        $employeeRole = \App\Models\Role::where('name', 'employee')->first();
+        if ($employeeRole) {
+            $user->update(['role_id' => $employeeRole->id]);
+        }
     }
 }

@@ -26,8 +26,8 @@
   <ul class="menu-inner py-1">
     @foreach ($menuData->menu as $menu)
 
-    {{-- Role-based filtering --}}
-    @if (isset($menu->role) && !auth()->user()->hasAnyRole($menu->role))
+    {{-- Action-based filtering --}}
+    @if (isset($menu->action) && !auth()->user()->canAction($menu->action))
       @continue
     @endif
 

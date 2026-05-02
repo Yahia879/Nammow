@@ -121,11 +121,11 @@
                       <h6 class="dropdown-header text-uppercase">{{ __('Import & Export') }}</h6>
                     </li>
                     <li>
-                      @can('Import leaves')
+                      @if(Auth::user()->canAction('manage_legacy_leaves'))
                       <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#importModal">
                         <i class="ti ti-table-import me-1"></i> {{ __('Import From Excel') }}
                       </button>
-                      @endcan
+                      @endif
                     </li>
                     <li>
                       <button wire:click='exportToExcel()' class="dropdown-item">

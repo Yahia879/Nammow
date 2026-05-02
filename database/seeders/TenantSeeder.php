@@ -75,7 +75,10 @@ class TenantSeeder extends Seeder
             'employee_id' => $employee->id,
         ]);
 
-        $clientAdmin->assignRole('client');
+        $clientRole = \App\Models\Role::where('name', 'client')->first();
+        if ($clientRole) {
+            $clientAdmin->update(['role_id' => $clientRole->id]);
+        }
 
         // 6. Add to Company Managers
         \Illuminate\Support\Facades\DB::table('company_managers')->updateOrInsert(
@@ -90,6 +93,9 @@ class TenantSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        $superAdmin->assignRole('super_admin');
+        $superAdminRole = \App\Models\Role::where('name', 'super_admin')->first();
+        if ($superAdminRole) {
+            $superAdmin->update(['role_id' => $superAdminRole->id]);
+        }
     }
 }
