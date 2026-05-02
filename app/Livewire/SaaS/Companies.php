@@ -55,8 +55,8 @@ class Companies extends Component
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
 
-        if (!$this->isEdit) {
-            foreach ($this->managers as $index => $manager) {
+        foreach ($this->managers as $index => $manager) {
+            if (!isset($manager['is_existing']) || !$manager['is_existing']) {
                 $rules["managers.{$index}.name"] = 'required|string|min:3';
                 $rules["managers.{$index}.email"] = 'required|email|unique:users,email|distinct';
                 $rules["managers.{$index}.phone"] = 'nullable';
@@ -187,7 +187,7 @@ class Companies extends Component
                 $user = User::create([
                     'name' => $managerData['name'],
                     'email' => $managerData['email'],
-                    'mobile' => $managerData['phone'],
+                    'mobile' => $managerData['phone'] ?: null,
                     'password' => Hash::make($managerData['password']),
                     'client_id' => auth()->user()->client_id,
                     'company_id' => $company->id,
@@ -220,27 +220,58 @@ class Companies extends Component
 
         $company = Company::where('client_id', auth()->user()->client_id)->findOrFail($this->companyId);
 
-        $data = [
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'status' => $this->status,
-        ];
+        DB::beginTransaction();
+        try {
+            $data = [
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'address' => $this->address,
+                'status' => $this->status,
+            ];
 
-        if ($this->logo) {
-            // Delete old logo if it exists
-            if ($company->logo) {
-                Storage::disk('public')->delete($company->logo);
+            if ($this->logo) {
+                // Delete old logo if it exists
+                if ($company->logo) {
+                    Storage::disk('public')->delete($company->logo);
+                }
+                $data['logo'] = $this->logo->store('company-logos', 'public');
             }
-            $data['logo'] = $this->logo->store('company-logos', 'public');
+
+            $company->update($data);
+
+            // Handle new managers added during edit
+            foreach ($this->managers as $managerData) {
+                if (!isset($managerData['is_existing']) || !$managerData['is_existing']) {
+                    $user = User::create([
+                        'name' => $managerData['name'],
+                        'email' => $managerData['email'],
+                        'mobile' => $managerData['phone'] ?: null,
+                        'password' => Hash::make($managerData['password']),
+                        'client_id' => auth()->user()->client_id,
+                        'company_id' => $company->id,
+                    ]);
+
+                    // Assign role
+                    $user->assignRole('company');
+
+                    CompanyManager::create([
+                        'company_id' => $company->id,
+                        'user_id' => $user->id,
+                        'status' => 'active',
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            $this->resetInputs();
+            $this->dispatch('closeModal', elementId: '#companyModal');
+            $this->dispatch('toastr', type: 'success', message: __('Company updated successfully!'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatch('toastr', type: 'error', message: __('Error: ') . $e->getMessage());
         }
-
-        $company->update($data);
-
-        $this->resetInputs();
-        $this->dispatch('closeModal', elementId: '#companyModal');
-        $this->dispatch('toastr', type: 'success', message: __('Company updated successfully!'));
     }
 
     public function confirmDelete($id)

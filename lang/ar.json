@@ -416,5 +416,14 @@
   "expired": "منتهي",
   "Basic": "أساسي",
   "Professional": "احترافي",
-  "Enterprise": "مؤسسات"
+  "Enterprise": "مؤسسات",
+  "SaaS": "SaaS",
+  "Client Dashboard": "لوحة تحكم العميل",
+  "Welcome to the Client Dashboard. Manage your companies here.": "أهلاً بك في لوحة تحكم العميل. أدر شركاتك من هنا.",
+  "client.dashboard.breadcrumb.root": "العميل",
+  "client.dashboard.breadcrumb.current": "لوحة التحكم",
+  "client.company_management": "إدارة الشركات",
+  "client.companies": "الشركات",
+  "super_admin.client_management": "إدارة العملاء",
+  "super_admin.clients": "العملاء"
 }

@@ -403,5 +403,14 @@
   "expired": "expired",
   "Basic": "Basic",
   "Professional": "Professional",
-  "Enterprise": "Enterprise"
+  "Enterprise": "Enterprise",
+  "SaaS": "SaaS",
+  "Client Dashboard": "Client Dashboard",
+  "Welcome to the Client Dashboard. Manage your companies here.": "Welcome to the Client Dashboard. Manage your companies here.",
+  "client.dashboard.breadcrumb.root": "SaaS",
+  "client.dashboard.breadcrumb.current": "Client Dashboard",
+  "client.company_management": "Company Management",
+  "client.companies": "Companies",
+  "super_admin.client_management": "Client Management",
+  "super_admin.clients": "Clients"
 }

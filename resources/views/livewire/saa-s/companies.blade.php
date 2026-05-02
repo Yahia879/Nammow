@@ -13,7 +13,7 @@
     @endsection
 
     <h4 class="fw-bold py-3 mb-4">
-        <span class="text-muted fw-light">{{ __('Client Management') }} /</span> {{ __('Companies') }}
+        <span class="text-muted fw-light">{{ __('client.company_management') }} /</span> {{ __('client.companies') }}
     </h4>
 
     <div class="card">
@@ -230,19 +230,17 @@
                                 <div class="tab-pane fade" :class="{ 'show active': activeTab === 'managers' }" id="navs-managers" role="tabpanel">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="mb-0">{{ __('Managers List') }}</h5>
-                                        @if(!$isEdit)
                                         <button wire:click="addManager" type="button" class="btn btn-sm btn-outline-primary">
                                             <i class="ti ti-plus me-1"></i> {{ __('Add Manager') }}
                                         </button>
-                                        @endif
                                     </div>
 
                                     @foreach($managers as $index => $manager)
                                     <div class="card border mb-3">
                                         <div class="card-body p-3">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="mb-0">{{ __('Manager') }} #{{ $index + 1 }} @if($isEdit && isset($manager['is_existing'])) <span class="badge bg-label-info ms-2">{{ __('Existing') }}</span> @endif</h6>
-                                                @if(!$isEdit && count($managers) > 1)
+                                                <h6 class="mb-0">{{ __('Manager') }} #{{ $index + 1 }} @if(isset($manager['is_existing']) && $manager['is_existing']) <span class="badge bg-label-info ms-2">{{ __('Existing') }}</span> @endif</h6>
+                                                @if((!isset($manager['is_existing']) || !$manager['is_existing']) && count($managers) > 1)
                                                 <button wire:click="removeManager({{ $index }})" type="button" class="btn btn-sm btn-label-danger btn-icon">
                                                     <i class="ti ti-x"></i>
                                                 </button>
@@ -251,20 +249,20 @@
                                             <div class="row g-3">
                                                 <div class="col-12">
                                                     <label class="form-label">{{ __('Manager Name') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.name" type="text" class="form-control @error('managers.' . $index . '.name') is-invalid @enderror" placeholder="{{ __('Manager Name') }}" {{ $isEdit ? 'readonly' : '' }}>
+                                                    <input wire:model="managers.{{ $index }}.name" type="text" class="form-control @error('managers.' . $index . '.name') is-invalid @enderror" placeholder="{{ __('Manager Name') }}" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
                                                     @error('managers.' . $index . '.name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">{{ __('Manager Email') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.email" type="email" class="form-control @error('managers.' . $index . '.email') is-invalid @enderror" placeholder="manager@company.com" {{ $isEdit ? 'readonly' : '' }}>
+                                                    <input wire:model="managers.{{ $index }}.email" type="email" class="form-control @error('managers.' . $index . '.email') is-invalid @enderror" placeholder="manager@company.com" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
                                                     @error('managers.' . $index . '.email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">{{ __('Manager Phone') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.phone" type="text" class="form-control @error('managers.' . $index . '.phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX" {{ $isEdit ? 'readonly' : '' }}>
+                                                    <input wire:model="managers.{{ $index }}.phone" type="text" class="form-control @error('managers.' . $index . '.phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
                                                     @error('managers.' . $index . '.phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                                 </div>
-                                                @if(!$isEdit)
+                                                @if(!isset($manager['is_existing']) || !$manager['is_existing'])
                                                 <div class="col-md-6">
                                                     <label class="form-label">{{ __('Password') }}</label>
                                                     <input wire:model="managers.{{ $index }}.password" type="password" class="form-control @error('managers.' . $index . '.password') is-invalid @enderror" placeholder="············">

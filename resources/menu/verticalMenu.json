@@ -4,22 +4,43 @@
       "url": "/super-admin/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
-      "slug": "super-admin-dashboard",
+      "slug": "super-admin.dashboard",
       "role": ["super_admin"]
+    },
+    {
+      "name": "super_admin.client_management",
+      "icon": "menu-icon tf-icons ti ti-users",
+      "slug": "super-admin.",
+      "role": ["super_admin"],
+      "submenu": [
+        {
+          "url": "/super-admin/clients",
+          "name": "super_admin.clients",
+          "slug": "super-admin-clients",
+          "role": ["super_admin"]
+        }
+      ]
     },
     {
       "url": "/client/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
-      "slug": "client-dashboard",
+      "slug": "client.dashboard",
       "role": ["client"]
     },
     {
-      "url": "/client/companies",
-      "name": "Companies",
+      "name": "client.company_management",
       "icon": "menu-icon tf-icons ti ti-building",
-      "slug": "client-companies",
-      "role": ["client"]
+      "slug": "client.",
+      "role": ["client"],
+      "submenu": [
+        {
+          "url": "/client/companies",
+          "name": "client.companies",
+          "slug": "client.companies",
+          "role": ["client"]
+        }
+      ]
     },
     {
       "url": "/company/dashboard",
@@ -34,17 +55,6 @@
       "icon": "menu-icon tf-icons ti ti-dashboard",
       "slug": "employee-dashboard",
       "role": ["employee"]
-    },
-    {
-      "menuHeader": "Management",
-      "role": ["super_admin"]
-    },
-    {
-      "url": "/super-admin/clients",
-      "name": "Clients",
-      "icon": "menu-icon tf-icons ti ti-users-group",
-      "slug": "super-admin-clients",
-      "role": ["super_admin"]
     },
     {
       "menuHeader": "Human resource",

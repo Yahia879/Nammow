@@ -48,6 +48,12 @@ class User extends Authenticatable
 
     protected $appends = ['profile_photo_url'];
 
+    // 👉 Mutators
+    public function setMobileAttribute($value)
+    {
+        $this->attributes['mobile'] = $value ?: null;
+    }
+
     // 👉 Links
     public function client(): BelongsTo
     {
