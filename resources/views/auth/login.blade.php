@@ -168,7 +168,7 @@ $configData = Helper::appClasses();
           @csrf
           <div class="mb-3">
             <label for="login" class="form-label">{{ __('Email or Employee ID') }}</label>
-            <input type="text" class="form-control @error('login') is-invalid @enderror" id="login" name="login" placeholder="example@namaa.sy" autofocus value="{{ old('login') }}">
+            <input type="text" class="form-control @error('login') is-invalid @enderror" id="login" name="login" placeholder="example@nammow.sa" autofocus value="{{ old('login') }}">
             @error('login')
             <span class="invalid-feedback" role="alert">
               <span class="fw-medium">{{ $message }}</span>

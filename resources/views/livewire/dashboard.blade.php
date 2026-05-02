@@ -110,10 +110,9 @@
               @endif
             </div>
           </div>
-          <div class="col-5 text-center text-sm-left h-100 d-flex align-items-end">
+          <div class="col-5 text-center h-100 d-flex align-items-center justify-content-center">
             <div class="card-body pb-0 px-0 px-md-4 w-100">
-              <img src="{{asset('assets/img/illustrations/card-advance-sale.png')}}" class="img-fluid" alt="view sales"
-                style="object-fit: contain; width: 100%; height: auto;">
+              <i class="ti ti-activity text-primary" style="font-size: 6rem; opacity: 0.2;"></i>
             </div>
           </div>
         </div>
@@ -412,9 +411,8 @@
                       {{ __('Add New Leave') }}
                     </button>
                     @endif
-                    <div>
-                      <img src="{{ asset('assets/img/illustrations/page-misc-under-maintenance.png') }}" width="200"
-                        class="img-fluid">
+                    <div class="text-light mt-3">
+                      <i class="ti ti-clipboard-off" style="font-size: 6rem; opacity: 0.2;"></i>
                     </div>
                   </div>
                 </td>
