@@ -18,54 +18,85 @@ app()->setLocale('ar');
     overflow: hidden;
   }
   .hero-section {
-    max-width: 550px;
+    max-width: 500px;
     width: 100%;
     padding: 2rem;
+    position: relative;
+    z-index: 5;
   }
-  .dashboard-metrics {
-    margin-top: 3rem;
-    animation: float-soft 8s ease-in-out infinite;
-  }
-  @keyframes float-soft {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+  .orbital-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
   }
   .metric-card {
+    position: absolute;
     background: #fff;
     border-radius: 14px;
-    padding: 1.25rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     border: 1px solid rgba(115, 103, 240, 0.08);
-    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 170px;
+    pointer-events: auto;
     text-align: right;
   }
-  .metric-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  
+  /* Orbital Positions & Animations */
+  .card-attendance { top: 15%; left: 10%; animation: orbit-1 12s ease-in-out infinite; }
+  .card-employees  { top: 15%; right: 10%; animation: orbit-2 14s ease-in-out infinite; }
+  .card-companies  { bottom: 15%; left: 10%; animation: orbit-3 13s ease-in-out infinite; }
+  .card-leaves     { bottom: 15%; right: 10%; animation: orbit-4 15s ease-in-out infinite; }
+
+  @keyframes orbit-1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(15px, 10px); }
   }
+  @keyframes orbit-2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-15px, 15px); }
+  }
+  @keyframes orbit-3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(10px, -15px); }
+  }
+  @keyframes orbit-4 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-10px, -10px); }
+  }
+
   .metric-icon {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.75rem;
+    flex-shrink: 0;
   }
-  .hero-logo {
-    margin-bottom: 1.5rem;
+  .bg-light-purple { background: rgba(115, 103, 240, 0.1); color: #7367f0; }
+  .bg-light-success { background: rgba(40, 199, 111, 0.1); color: #28c76f; }
+  .bg-light-info { background: rgba(0, 207, 221, 0.1); color: #00cfdd; }
+  .bg-light-warning { background: rgba(255, 159, 67, 0.1); color: #ff9f43; }
+
+  .hero-logo { margin-bottom: 1rem; }
+  .hero-title { color: #5d596c; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero-subtitle { color: #7367f0; font-weight: 600; margin-bottom: 1rem; }
+  
+  [dir="ltr"] .metric-card { text-align: left; }
+  
+  /* Responsive */
+  @media (max-width: 1400px) {
+    .metric-card { min-width: 150px; padding: 0.75rem 1rem; }
+    .card-attendance, .card-companies { left: 5%; }
+    .card-employees, .card-leaves { right: 5%; }
   }
-  .hero-title {
-    color: #5d596c;
-    font-weight: 700;
-  }
-  .hero-subtitle {
-    color: #7367f0;
-    font-weight: 600;
-  }
-  [dir="ltr"] .metric-card {
-    text-align: left;
-  }
+</media>
 </style>
 @endsection
 
@@ -74,48 +105,47 @@ app()->setLocale('ar');
   <div class="authentication-inner row">
     <!-- Branding Section (SaaS Hero) -->
     <div class="d-none d-lg-flex col-lg-7 p-0">
-      <div class="auth-cover-bg w-100 d-flex justify-content-center align-items-center">
-        <div class="hero-section text-center">
-          <div class="hero-logo">
-            <img src="{{ asset('assets/img/logo/logo_128.png') }}" alt="HRMS Logo" width="60">
-          </div>
-          <h1 class="hero-title display-4 mb-2">{{ __('login.title') }}</h1>
-          <h2 class="hero-subtitle h4 mb-3">{{ __('login.hero_subtitle') }}</h2>
-          <p class="text-muted h5 fw-normal mb-5">{{ __('login.hero_description') }}</p>
-
-          <!-- Dashboard Preview Cards -->
-          <div class="dashboard-metrics">
-            <div class="row g-4">
-              <div class="col-6">
-                <div class="metric-card">
-                  <div class="metric-icon bg-light-success"><i class="ti ti-chart-bar ti-sm"></i></div>
-                  <h4 class="mb-1">94%</h4>
-                  <p class="text-muted small mb-0">{{ __('login.dashboard_attendance_today') }}</p>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="metric-card">
-                  <div class="metric-icon bg-light-purple"><i class="ti ti-users ti-sm"></i></div>
-                  <h4 class="mb-1">250</h4>
-                  <p class="text-muted small mb-0">{{ __('login.dashboard_total_employees') }}</p>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="metric-card">
-                  <div class="metric-icon bg-light-info"><i class="ti ti-building ti-sm"></i></div>
-                  <h4 class="mb-1">12</h4>
-                  <p class="text-muted small mb-0">{{ __('login.dashboard_active_companies') }}</p>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="metric-card">
-                  <div class="metric-icon bg-light-warning"><i class="ti ti-calendar-stats ti-sm"></i></div>
-                  <h4 class="mb-1">18</h4>
-                  <p class="text-muted small mb-0">{{ __('login.dashboard_leave_requests') }}</p>
-                </div>
-              </div>
+      <div class="auth-cover-bg w-100 d-flex justify-content-center align-items-center position-relative">
+        
+        <!-- Orbital Metrics -->
+        <div class="orbital-container">
+          <div class="metric-card card-attendance">
+            <div class="metric-icon bg-light-success"><i class="ti ti-chart-bar ti-xs"></i></div>
+            <div>
+              <h5 class="mb-0">94%</h5>
+              <p class="text-muted extra-small mb-0">{{ __('login.dashboard_attendance_today') }}</p>
             </div>
           </div>
+          <div class="metric-card card-employees">
+            <div class="metric-icon bg-light-purple"><i class="ti ti-users ti-xs"></i></div>
+            <div>
+              <h5 class="mb-0">250</h5>
+              <p class="text-muted extra-small mb-0">{{ __('login.dashboard_total_employees') }}</p>
+            </div>
+          </div>
+          <div class="metric-card card-companies">
+            <div class="metric-icon bg-light-info"><i class="ti ti-building ti-xs"></i></div>
+            <div>
+              <h5 class="mb-0">12</h5>
+              <p class="text-muted extra-small mb-0">{{ __('login.dashboard_active_companies') }}</p>
+            </div>
+          </div>
+          <div class="metric-card card-leaves">
+            <div class="metric-icon bg-light-warning"><i class="ti ti-calendar-stats ti-xs"></i></div>
+            <div>
+              <h5 class="mb-0">18</h5>
+              <p class="text-muted extra-small mb-0">{{ __('login.dashboard_leave_requests') }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-section text-center">
+          <div class="hero-logo">
+            <img src="{{ asset('assets/img/logo/logo_128.png') }}" alt="HRMS Logo" width="50">
+          </div>
+          <h1 class="hero-title display-5">{{ __('login.title') }}</h1>
+          <h2 class="hero-subtitle h5">{{ __('login.hero_subtitle') }}</h2>
+          <p class="text-muted h6 fw-normal">{{ __('login.hero_description') }}</p>
         </div>
       </div>
     </div>
