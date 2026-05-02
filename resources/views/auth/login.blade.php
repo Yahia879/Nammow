@@ -1,7 +1,6 @@
 @php
 $customizerHidden = 'customizer-hide';
 $configData = Helper::appClasses();
-app()->setLocale('ar');
 @endphp
 
 @extends('layouts/blankLayout')

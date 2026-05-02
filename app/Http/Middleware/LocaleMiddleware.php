@@ -19,7 +19,7 @@ class LocaleMiddleware
         if (session()->has('locale') && in_array(session()->get('locale'), ['ar', 'en'])) {
             app()->setLocale(session()->get('locale'));
         } else {
-            app()->setLocale('en');
+            app()->setLocale(config('app.locale'));
         }
 
         return $next($request);
