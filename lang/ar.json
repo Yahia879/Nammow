@@ -425,5 +425,11 @@
   "client.company_management": "إدارة الشركات",
   "client.companies": "الشركات",
   "super_admin.client_management": "إدارة العملاء",
-  "super_admin.clients": "العملاء"
+  "super_admin.clients": "العملاء",
+  "login.title": "نمو HRMS",
+  "login.subtitle": "أدر فريق عملك بكفاءة في مكان واحد",
+  "Payroll": "الرواتب",
+  "super_admin.dashboard.breadcrumb.root": "المدير العام",
+  "super_admin.dashboard.breadcrumb.current": "لوحة التحكم",
+  "super_admin.dashboard.welcome": "أهلاً بك في لوحة تحكم المدير العام. لديك الصلاحية الكاملة لإدارة النظام."
 }

@@ -412,5 +412,11 @@
   "client.company_management": "Company Management",
   "client.companies": "Companies",
   "super_admin.client_management": "Client Management",
-  "super_admin.clients": "Clients"
+  "super_admin.clients": "Clients",
+  "login.title": "Nammow HRMS",
+  "login.subtitle": "Manage your workforce efficiently in one place",
+  "Payroll": "Payroll",
+  "super_admin.dashboard.breadcrumb.root": "SaaS",
+  "super_admin.dashboard.breadcrumb.current": "Super Admin Dashboard",
+  "super_admin.dashboard.welcome": "Welcome to the Super Admin Dashboard. You have full control over the system."
 }
