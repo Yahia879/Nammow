@@ -333,7 +333,41 @@ class CalculateDiscountsAsDays implements ShouldQueue
                     $fingerprint->is_checked = 1;
                     $fingerprint->save();
                 }
+
+                // 👉 Deduct Advance Installments
+                $this->deductAdvanceInstallments($employee);
             }
+        }
+    }
+
+    private function deductAdvanceInstallments(Employee $employee): void
+    {
+        $dates = explode(' to ', $this->batch);
+        $fromDate = Carbon::create($dates[0]);
+        $toDate = Carbon::create($dates[1]);
+
+        $dueInstallments = \App\Models\AdvanceInstallment::where('company_id', $employee->company_id)
+            ->whereHas('advance', function($q) use ($employee) {
+                $q->where('employee_id', $employee->id)->where('status', 'approved');
+            })
+            ->where('status', 'unpaid')
+            ->whereBetween('due_date', [$fromDate, $toDate])
+            ->get();
+
+        foreach ($dueInstallments as $installment) {
+            $employee->discounts()->create([
+                'company_id' => $employee->company_id,
+                'rate' => 0,
+                'amount' => $installment->amount,
+                'date' => $installment->due_date,
+                'reason' => __('Advance Installment Deduction') . ' (' . $installment->advance->id . ')',
+                'batch' => $this->batch,
+                'is_auto' => true,
+            ]);
+
+            $installment->update([
+                'status' => 'deducted',
+            ]);
         }
     }
 

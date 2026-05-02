@@ -99,6 +99,16 @@ class Employee extends Model
         return $this->hasMany(Discount::class);
     }
 
+    public function salary(): HasOne
+    {
+        return $this->hasOne(Salary::class)->latestOfMany();
+    }
+
+    public function salaries(): HasMany
+    {
+        return $this->hasMany(Salary::class);
+    }
+
     // 👉 Attributes
     public function getFullNameAttribute()
     {

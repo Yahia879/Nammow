@@ -57,6 +57,8 @@ Route::middleware([
         Route::get('/clients', Clients::class)->middleware('check.action:view_clients')->name('super-admin-clients');
         Route::get('/leaves', ManagerLeaveRequests::class)->middleware('check.action:view_leaves')->name('super-admin.leaves');
         Route::get('/holidays', HolidayManagement::class)->middleware('check.action:view_holidays')->name('super-admin.holidays');
+        Route::get('/advances', \App\Livewire\HumanResource\Advances\AdvanceManagement::class)->middleware('check.action:manage_advances')->name('super-admin.advances');
+        Route::get('/salaries', \App\Livewire\HumanResource\Salary\SalaryManagement::class)->middleware('check.action:view_employee_salary')->name('super-admin.salaries');
     });
 
     // 👉 Client Routes
@@ -65,6 +67,8 @@ Route::middleware([
         Route::get('/companies', \App\Livewire\SaaS\Companies::class)->middleware('check.action:view_companies')->name('client.companies');
         Route::get('/leaves', ManagerLeaveRequests::class)->middleware('check.action:view_leaves')->name('client.leaves');
         Route::get('/holidays', HolidayManagement::class)->middleware('check.action:view_holidays')->name('client.holidays');
+        Route::get('/advances', \App\Livewire\HumanResource\Advances\AdvanceManagement::class)->middleware('check.action:view_client_advances')->name('client.advances');
+        Route::get('/salaries', \App\Livewire\HumanResource\Salary\SalaryManagement::class)->middleware('check.action:view_employee_salary')->name('client.salaries');
     });
 
     // 👉 Company Routes
@@ -72,6 +76,9 @@ Route::middleware([
         Route::get('/dashboard', Dashboard::class)->middleware('check.action:view_dashboard_company')->name('company.dashboard');
         Route::get('/leaves', ManagerLeaveRequests::class)->middleware('check.action:view_leaves')->name('company.leaves');
         Route::get('/holidays', HolidayManagement::class)->middleware('check.action:view_holidays')->name('company.holidays');
+        Route::get('/advances', \App\Livewire\HumanResource\Advances\AdvanceManagement::class)->middleware('check.action:view_company_advances')->name('company.advances');
+        Route::get('/advances/settings', \App\Livewire\HumanResource\Advances\AdvanceSettings::class)->middleware('check.action:manage_advance_settings')->name('company.advances.settings');
+        Route::get('/salaries', \App\Livewire\HumanResource\Salary\SalaryManagement::class)->middleware('check.action:view_employee_salary')->name('company.salaries');
     });
 
     // 👉 Employee Routes
@@ -79,6 +86,8 @@ Route::middleware([
         Route::get('/dashboard', Dashboard::class)->middleware('check.action:view_dashboard_employee')->name('employee.dashboard');
         Route::get('/leaves', EmployeeLeaveRequests::class)->middleware('check.action:view_my_leaves')->name('employee.leaves');
         Route::get('/holidays', EmployeeHolidays::class)->middleware('check.action:view_my_holidays')->name('employee.holidays');
+        Route::get('/advances', \App\Livewire\HumanResource\Advances\EmployeeAdvances::class)->middleware('check.action:view_my_advances')->name('employee.advances');
+        Route::get('/salary', \App\Livewire\HumanResource\Salary\EmployeeSalary::class)->middleware('check.action:view_my_salary')->name('employee.salary');
     });
 
     // 👉 Dashboard

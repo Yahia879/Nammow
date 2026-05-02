@@ -18,12 +18,20 @@ class RoleSeeder extends Seeder
                 'view_companies', 'create_companies', 'edit_companies', 'delete_companies',
                 'view_leaves', 'manage_leave_requests',
                 'view_holidays', 'create_holidays', 'edit_holidays', 'delete_holidays',
+                'manage_advances',
+                'view_company_advances',
+                'manage_advance_settings',
+                'view_employee_salary',
             ],
             'client' => [
                 'view_dashboard_client',
                 'view_companies', 'create_companies', 'edit_companies', 'delete_companies',
                 'view_leaves', 'manage_leave_requests',
                 'view_holidays', 'create_holidays', 'edit_holidays', 'delete_holidays',
+                'view_client_advances',
+                'view_company_advances',
+                'manage_advance_settings',
+                'view_employee_salary',
             ],
             'company' => [
                 'view_dashboard_company',
@@ -39,11 +47,16 @@ class RoleSeeder extends Seeder
                 'view_assets', 'manage_assets',
                 'view_asset_categories', 'manage_asset_categories',
                 'view_asset_reports',
+                'approve_advance', 'reject_advance', 'view_company_advances',
+                'manage_advance_settings',
+                'manage_employee_salary', 'view_employee_salary',
             ],
             'employee' => [
                 'view_dashboard_employee',
                 'view_my_leaves', 'create_leave_requests', 'delete_leave_requests',
                 'view_my_holidays',
+                'request_advance', 'view_my_advances',
+                'view_my_salary',
             ],
         ];
 

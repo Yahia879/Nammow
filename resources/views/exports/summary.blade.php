@@ -40,7 +40,11 @@
             <td align=center>{{ $discount->date }}</td>
             <td bgcolor=orange align=center class="text-center">
               <div class="badge bg-label-danger me-1">
-                {{ $discount->rate }}
+                @if($discount->amount > 0)
+                  {{ number_format($discount->amount, 2) }}
+                @else
+                  {{ $discount->rate }}
+                @endif
               </div>
             </td>
             <td>

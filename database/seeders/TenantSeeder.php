@@ -86,6 +86,26 @@ class TenantSeeder extends Seeder
             ['role' => 'admin', 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]
         );
 
+        // 6.b Create a dedicated Company Manager
+        $companyManager = User::firstOrCreate(['email' => 'company@nammow.com'], [
+            'name' => 'Company Manager',
+            'username' => 'company_manager',
+            'password' => bcrypt('password'),
+            'client_id' => $client->id,
+            'company_id' => $company->id,
+            'employee_id' => $employee->id, // Linking to the same employee for testing
+        ]);
+
+        $companyRole = \App\Models\Role::where('name', 'company')->first();
+        if ($companyRole) {
+            $companyManager->update(['role_id' => $companyRole->id]);
+        }
+
+        \Illuminate\Support\Facades\DB::table('company_managers')->updateOrInsert(
+            ['company_id' => $company->id, 'user_id' => $companyManager->id],
+            ['role' => 'manager', 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]
+        );
+
         // 7. Ensure Super Admin exists and is updated
         $superAdmin = User::firstOrCreate(['email' => 'admin@nammow.com'], [
             'name' => 'Super Admin',

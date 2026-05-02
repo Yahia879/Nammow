@@ -70,6 +70,21 @@ class ActionSeeder extends Seeder
             ['name' => 'view_asset_categories', 'group' => 'assets'],
             ['name' => 'manage_asset_categories', 'group' => 'assets'],
             ['name' => 'view_asset_reports', 'group' => 'assets'],
+
+            // Advances / Loans
+            ['name' => 'request_advance', 'group' => 'advances'],
+            ['name' => 'view_my_advances', 'group' => 'advances'],
+            ['name' => 'approve_advance', 'group' => 'advances'],
+            ['name' => 'reject_advance', 'group' => 'advances'],
+            ['name' => 'view_company_advances', 'group' => 'advances'],
+            ['name' => 'view_client_advances', 'group' => 'advances'],
+            ['name' => 'manage_advances', 'group' => 'advances'],
+            ['name' => 'manage_advance_settings', 'group' => 'advances'],
+
+            // Salary
+            ['name' => 'manage_employee_salary', 'group' => 'salary'],
+            ['name' => 'view_employee_salary', 'group' => 'salary'],
+            ['name' => 'view_my_salary', 'group' => 'salary'],
         ];
 
         foreach ($actions as $action) {

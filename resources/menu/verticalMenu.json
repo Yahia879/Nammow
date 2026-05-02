@@ -57,6 +57,20 @@
       "action": "view_holidays"
     },
     {
+      "url": "/client/advances",
+      "name": "Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "client-advances",
+      "action": "view_client_advances"
+    },
+    {
+      "url": "/client/salaries",
+      "name": "Salaries",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "client-salaries",
+      "action": "view_employee_salary"
+    },
+    {
       "url": "/company/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
@@ -76,6 +90,33 @@
       "icon": "menu-icon tf-icons ti ti-christmas-tree",
       "slug": "company-holidays",
       "action": "view_holidays"
+    },
+    {
+      "name": "Loans & Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "company-advances",
+      "action": "view_company_advances",
+      "submenu": [
+        {
+          "url": "/company/advances",
+          "name": "Management",
+          "slug": "company-advances-management",
+          "action": "view_company_advances"
+        },
+        {
+          "url": "/company/advances/settings",
+          "name": "Settings",
+          "slug": "company-advances-settings",
+          "action": "manage_advance_settings"
+        }
+      ]
+    },
+    {
+      "url": "/company/salaries",
+      "name": "Salaries",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "company-salaries",
+      "action": "view_employee_salary"
     },
     {
       "url": "/employee/dashboard",
@@ -99,6 +140,20 @@
       "action": "view_my_holidays"
     },
     {
+      "url": "/employee/advances",
+      "name": "My Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "employee-advances",
+      "action": "view_my_advances"
+    },
+    {
+      "url": "/employee/salary",
+      "name": "My Salary",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "employee-salary",
+      "action": "view_my_salary"
+    },
+    {
       "menuHeader": "Management",
       "action": "view_clients"
     },
@@ -115,6 +170,20 @@
       "icon": "menu-icon tf-icons ti ti-christmas-tree",
       "slug": "super-admin-holidays",
       "action": "view_holidays"
+    },
+    {
+      "url": "/super-admin/advances",
+      "name": "Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "super-admin-advances",
+      "action": "manage_advances"
+    },
+    {
+      "url": "/super-admin/salaries",
+      "name": "Salaries",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "super-admin-salaries",
+      "action": "view_employee_salary"
     },
     {
       "menuHeader": "Human resource",
