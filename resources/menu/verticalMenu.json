@@ -22,6 +22,20 @@
       "role": ["client"]
     },
     {
+      "url": "/client/leaves",
+      "name": "Leaves Requests",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "client-leaves",
+      "role": ["client"]
+    },
+    {
+      "url": "/client/holidays",
+      "name": "Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "client-holidays",
+      "role": ["client"]
+    },
+    {
       "url": "/company/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
@@ -29,10 +43,38 @@
       "role": ["company"]
     },
     {
+      "url": "/company/leaves",
+      "name": "Leaves Requests",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "company-leaves",
+      "role": ["company"]
+    },
+    {
+      "url": "/company/holidays",
+      "name": "Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "company-holidays",
+      "role": ["company"]
+    },
+    {
       "url": "/employee/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
       "slug": "employee-dashboard",
+      "role": ["employee"]
+    },
+    {
+      "url": "/employee/leaves",
+      "name": "My Leaves",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "employee-leaves",
+      "role": ["employee"]
+    },
+    {
+      "url": "/employee/holidays",
+      "name": "Company Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "employee-holidays",
       "role": ["employee"]
     },
     {
@@ -44,6 +86,20 @@
       "name": "Clients",
       "icon": "menu-icon tf-icons ti ti-users-group",
       "slug": "super-admin-clients",
+      "role": ["super_admin"]
+    },
+    {
+      "url": "/super-admin/leaves",
+      "name": "Leaves Requests",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "super-admin-leaves",
+      "role": ["super_admin"]
+    },
+    {
+      "url": "/super-admin/holidays",
+      "name": "Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "super-admin-holidays",
       "role": ["super_admin"]
     },
     {
@@ -64,7 +120,7 @@
         },
         {
           "url": "attendance/leaves",
-          "name": "Leaves",
+          "name": "Legacy Leaves",
           "slug": "attendance-leaves",
           "role": ["company"]
         }
@@ -127,13 +183,6 @@
       "name": "Discounts",
       "icon": "menu-icon tf-icons ti ti-coin",
       "slug": "discounts",
-      "role": ["company"]
-    },
-    {
-      "url": "/holidays",
-      "name": "Holidays",
-      "icon": "menu-icon tf-icons ti ti-christmas-tree",
-      "slug": "holidays",
       "role": ["company"]
     },
     {

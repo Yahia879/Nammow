@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             TimelineSeeder::class,
             TenantSeeder::class,
+            LeaveTypeSeeder::class,
+            TestEmployeeSeeder::class,
         ]);
 
         if (file_exists('database/seeders/SettingsSeeder.php')) {

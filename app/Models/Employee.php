@@ -238,7 +238,7 @@ class Employee extends Model
     {
         $data = Timeline::where('employee_id', $this->id)->first();
         if ($data) {
-            return Carbon::parse($data->start_date)->translatedFormat('j F Y');
+            return Carbon::parse($data->start_date)->format('j F Y');
         } else {
             return '---';
         }

@@ -9,7 +9,10 @@ use App\Livewire\Dashboard;
 use App\Livewire\HumanResource\Attendance\Fingerprints;
 use App\Livewire\HumanResource\Attendance\Leaves;
 use App\Livewire\HumanResource\Discounts;
-use App\Livewire\HumanResource\Holidays;
+use App\Livewire\HumanResource\Holidays\EmployeeHolidays;
+use App\Livewire\HumanResource\Holidays\HolidayManagement;
+use App\Livewire\HumanResource\LeaveRequests\EmployeeLeaveRequests;
+use App\Livewire\HumanResource\LeaveRequests\ManagerLeaveRequests;
 use App\Livewire\HumanResource\Messages\Bulk;
 use App\Livewire\HumanResource\Messages\Personal;
 use App\Livewire\HumanResource\Statistics;
@@ -52,21 +55,29 @@ Route::middleware([
     Route::group(['prefix' => 'super-admin', 'middleware' => ['role_redirect:super_admin']], function () {
         Route::get('/dashboard', SuperAdminDashboard::class)->name('super-admin.dashboard');
         Route::get('/clients', Clients::class)->name('super-admin-clients');
+        Route::get('/leaves', ManagerLeaveRequests::class)->name('super-admin.leaves');
+        Route::get('/holidays', HolidayManagement::class)->name('super-admin.holidays');
     });
 
     // 👉 Client Routes
     Route::group(['prefix' => 'client', 'middleware' => ['role_redirect:client']], function () {
         Route::get('/dashboard', ClientDashboard::class)->name('client.dashboard');
+        Route::get('/leaves', ManagerLeaveRequests::class)->name('client.leaves');
+        Route::get('/holidays', HolidayManagement::class)->name('client.holidays');
     });
 
     // 👉 Company Routes
     Route::group(['prefix' => 'company', 'middleware' => ['role_redirect:company']], function () {
         Route::get('/dashboard', Dashboard::class)->name('company.dashboard');
+        Route::get('/leaves', ManagerLeaveRequests::class)->name('company.leaves');
+        Route::get('/holidays', HolidayManagement::class)->name('company.holidays');
     });
 
     // 👉 Employee Routes
     Route::group(['prefix' => 'employee', 'middleware' => ['role_redirect:employee']], function () {
         Route::get('/dashboard', Dashboard::class)->name('employee.dashboard');
+        Route::get('/leaves', EmployeeLeaveRequests::class)->name('employee.leaves');
+        Route::get('/holidays', EmployeeHolidays::class)->name('employee.holidays');
     });
 
     // 👉 Dashboard
@@ -109,7 +120,7 @@ Route::middleware([
 
     Route::group(['middleware' => ['role:company']], function () {
         Route::get('/discounts', Discounts::class)->name('discounts');
-        Route::get('/holidays', Holidays::class)->name('holidays');
+        // Route::get('/holidays', Holidays::class)->name('holidays');
     });
 
     Route::group(['middleware' => ['role:company']], function () {

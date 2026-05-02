@@ -48,6 +48,7 @@ class TenantSeeder extends Seeder
 
         // 4. Create an Employee for the Client Admin
         $employee = Employee::firstOrCreate(['national_number' => '00000000'], [
+            'company_id' => $company->id,
             'first_name' => 'Client',
             'father_name' => 'System',
             'last_name' => 'Admin',
@@ -76,7 +77,13 @@ class TenantSeeder extends Seeder
 
         $clientAdmin->assignRole('client');
 
-        // 6. Ensure Super Admin exists and is updated
+        // 6. Add to Company Managers
+        \Illuminate\Support\Facades\DB::table('company_managers')->updateOrInsert(
+            ['company_id' => $company->id, 'user_id' => $clientAdmin->id],
+            ['role' => 'admin', 'status' => 'active', 'created_at' => now(), 'updated_at' => now()]
+        );
+
+        // 7. Ensure Super Admin exists and is updated
         $superAdmin = User::firstOrCreate(['email' => 'admin@nammow.com'], [
             'name' => 'Super Admin',
             'username' => 'super_admin',
