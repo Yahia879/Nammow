@@ -95,7 +95,77 @@ $configData = Helper::appClasses();
     .card-attendance, .card-companies { left: 5%; }
     .card-employees, .card-leaves { right: 5%; }
   }
-</media>
+
+  /* Dark Mode Enhancements */
+  .dark-style .auth-cover-bg {
+    background-color: #25293c !important;
+  }
+
+  .dark-style .metric-card {
+    background: #2f3349 !important;
+    border-color: rgba(225, 222, 245, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(15, 20, 34, 0.4) !important;
+  }
+
+  .dark-style .metric-card h5 {
+    color: #cfd3ed !important;
+  }
+
+  .dark-style .metric-card .text-muted {
+    color: #a3a7cc !important;
+  }
+
+  .dark-style .hero-title {
+    color: #daddf5 !important;
+  }
+
+  .dark-style .hero-section .text-muted {
+    color: #a3a7cc !important;
+  }
+
+  .dark-style .authentication-inner {
+    background-color: #2f3349 !important;
+  }
+
+  .dark-style .col-lg-5.align-items-center {
+    background-color: #2f3349 !important;
+  }
+
+  .dark-style h3 {
+    color: #cfd3ed !important;
+  }
+
+  .dark-style .w-px-400 p.mb-4 {
+    color: #a3a7cc !important;
+  }
+
+  .dark-style .form-label {
+    color: #cfd3ed !important;
+  }
+
+  .dark-style .form-control {
+    background-color: #2f3349 !important;
+    border-color: #434968 !important;
+    color: #cfd3ed !important;
+  }
+
+  .dark-style .form-control:focus {
+    border-color: #7367f0 !important;
+  }
+
+  .dark-style .input-group-text {
+    background-color: #2f3349 !important;
+    border-color: #434968 !important;
+    color: #7983bb !important;
+  }
+
+  .dark-style .form-control::placeholder {
+    color: #7983bb !important;
+  }
+
+  .dark-style .form-check-label {
+    color: #a3a7cc !important;
+  }
 </style>
 @endsection
 
