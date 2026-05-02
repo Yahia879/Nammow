@@ -38,7 +38,9 @@
                             <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="{{ __('Search reason...') }}">
                         </div>
                         <div class="col-md-1">
-                            <button wire:click="resetFilters" class="btn btn-outline-secondary w-100">{{ __('Reset') }}</button>
+                            <button wire:click="resetFilters" class="btn btn-label-primary w-100">
+                                <i class="ti ti-refresh me-1"></i>{{ __('Reset') }}
+                            </button>
                         </div>
                     </div>
 

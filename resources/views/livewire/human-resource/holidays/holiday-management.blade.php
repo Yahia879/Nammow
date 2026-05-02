@@ -61,7 +61,9 @@
                             <input type="date" wire:model.live="date_to" class="form-control form-control-sm">
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
-                            <button wire:click="resetFilters" class="btn btn-sm btn-outline-secondary w-100">{{ __('Reset') }}</button>
+                            <button wire:click="resetFilters" class="btn btn-sm btn-label-primary w-100">
+                                <i class="ti ti-refresh me-1"></i>{{ __('Reset') }}
+                            </button>
                         </div>
                     </div>
 
