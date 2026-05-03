@@ -9,4 +9,8 @@ return [
     'cr_image' => 'Commercial Registration Image',
     'phone' => 'Phone',
     'allowed_formats' => 'Allowed formats: JPG, PNG, WEBP, PDF',
+    'add_manager' => 'Add Manager',
+    'edit_manager' => 'Edit Company Manager',
+    'company' => 'Company',
+    'add_manager_description' => 'Please enter manager details to create a new account and link it to the company',
 ];

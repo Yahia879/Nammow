@@ -156,6 +156,7 @@
                                     @endif
                                 </button>
                             </li>
+                            @if($isEdit)
                             <li class="nav-item">
                                 <button x-on:click="activeTab = 'managers'" type="button" class="nav-link" :class="{ 'active': activeTab === 'managers' }" role="tab">
                                     <i class="ti ti-users me-1"></i> {{ __('Company Managers') }}
@@ -164,6 +165,7 @@
                                     @endif
                                 </button>
                             </li>
+                            @endif
                         </ul>
                         <form wire:submit.prevent="submit">
                             <div class="tab-content">
@@ -245,6 +247,7 @@
                                 </div>
 
                                 <!-- Company Managers Tab -->
+                                @if($isEdit)
                                 <div class="tab-pane fade" :class="{ 'show active': activeTab === 'managers' }" id="navs-managers" role="tabpanel">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="mb-0">{{ __('Managers List') }}</h5>
@@ -301,6 +304,7 @@
                                     </div>
                                     @endforeach
                                 </div>
+                                @endif
                             </div>
                             </div>
 

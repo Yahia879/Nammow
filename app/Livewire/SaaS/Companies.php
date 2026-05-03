@@ -65,7 +65,7 @@ class Companies extends Component
         ];
 
         foreach ($this->managers as $index => $manager) {
-            if (!isset($manager['is_existing']) || !$manager['is_existing']) {
+            if ($this->isEdit && (!isset($manager['is_existing']) || !$manager['is_existing'])) {
                 $rules["managers.{$index}.name"] = 'required|string|min:3';
                 $rules["managers.{$index}.email"] = 'required|email|unique:users,email|distinct';
                 $rules["managers.{$index}.phone"] = 'nullable';
@@ -79,11 +79,13 @@ class Companies extends Component
     protected function validationAttributes()
     {
         $attributes = [];
-        foreach ($this->managers as $index => $manager) {
-            $attributes["managers.{$index}.name"] = __('Manager Name') . ' (#' . ($index + 1) . ')';
-            $attributes["managers.{$index}.email"] = __('Manager Email') . ' (#' . ($index + 1) . ')';
-            $attributes["managers.{$index}.phone"] = __('Manager Phone') . ' (#' . ($index + 1) . ')';
-            $attributes["managers.{$index}.password"] = __('Manager Password') . ' (#' . ($index + 1) . ')';
+        if ($this->isEdit) {
+            foreach ($this->managers as $index => $manager) {
+                $attributes["managers.{$index}.name"] = __('Manager Name') . ' (#' . ($index + 1) . ')';
+                $attributes["managers.{$index}.email"] = __('Manager Email') . ' (#' . ($index + 1) . ')';
+                $attributes["managers.{$index}.phone"] = __('Manager Phone') . ' (#' . ($index + 1) . ')';
+                $attributes["managers.{$index}.password"] = __('Manager Password') . ' (#' . ($index + 1) . ')';
+            }
         }
         return $attributes;
     }
@@ -103,7 +105,7 @@ class Companies extends Component
     {
         unset($this->managers[$index]);
         $this->managers = array_values($this->managers); // Re-index
-        if (count($this->managers) === 0) {
+        if (count($this->managers) === 0 && $this->isEdit) {
             $this->addManager();
         }
     }
@@ -123,7 +125,6 @@ class Companies extends Component
         $this->reset(['companyId', 'name', 'owner_name', 'cr_number', 'unified_number', 'attestation_date', 'attestation_expiry_date', 'email', 'phone', 'address', 'status', 'cr_image', 'existingCrImage', 'isEdit', 'managers', 'activeTab']);
         $this->status = 'active';
         $this->activeTab = 'company-info';
-        $this->addManager();
     }
 
     public function showCreateCompanyModal()
@@ -202,31 +203,11 @@ class Companies extends Component
                 'is_active' => true,
             ]);
 
-            foreach ($this->managers as $managerData) {
-                $user = User::create([
-                    'name' => $managerData['name'],
-                    'email' => $managerData['email'],
-                    'mobile' => $managerData['phone'] ?: null,
-                    'password' => Hash::make($managerData['password']),
-                    'client_id' => auth()->user()->client_id,
-                    'company_id' => $company->id,
-                ]);
-
-                // Assign role
-                $user->assignRole('company');
-
-                CompanyManager::create([
-                    'company_id' => $company->id,
-                    'user_id' => $user->id,
-                    'status' => 'active',
-                ]);
-            }
-
             DB::commit();
 
             $this->resetInputs();
             $this->dispatch('closeModal', elementId: '#companyModal');
-            $this->dispatch('toastr', type: 'success', message: __('Company and managers created successfully!'));
+            $this->dispatch('toastr', type: 'success', message: __('Company created successfully!'));
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('toastr', type: 'error', message: __('Error: ') . $e->getMessage());

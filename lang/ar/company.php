@@ -9,4 +9,8 @@ return [
     'cr_image' => 'صورة السجل التجاري',
     'phone' => 'رقم الهاتف',
     'allowed_formats' => 'الصيغ المسموحة: JPG, PNG, WEBP, PDF',
+    'add_manager' => 'إضافة مدير',
+    'edit_manager' => 'تعديل مدير الشركة',
+    'company' => 'الشركة',
+    'add_manager_description' => 'يرجى إدخال بيانات المدير لإنشاء حساب جديد وربطه بالشركة',
 ];

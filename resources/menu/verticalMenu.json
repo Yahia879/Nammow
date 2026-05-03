@@ -39,6 +39,12 @@
           "name": "client.companies",
           "slug": "client.companies",
           "role": ["client"]
+        },
+        {
+          "url": "/client/company-managers",
+          "name": "Company Managers",
+          "slug": "client.company-managers",
+          "role": ["client"]
         }
       ]
     },
