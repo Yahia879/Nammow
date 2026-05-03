@@ -18,6 +18,8 @@ class CompanyManagers extends Component
 
     // Search and Filter properties
     public $searchTerm = '';
+    public $companySearch = '';
+    public $filterCompany = '';
 
     // Form properties
     public $managerId;
@@ -26,7 +28,7 @@ class CompanyManagers extends Component
     public $phone;
     public $password;
     public $password_confirmation;
-    public $company_id;
+    public $selected_companies = [];
 
     public $isEdit = false;
     public $confirmedId;
@@ -36,9 +38,14 @@ class CompanyManagers extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterCompany()
+    {
+        $this->resetPage();
+    }
+
     public function resetInputs()
     {
-        $this->reset(['managerId', 'name', 'email', 'phone', 'password', 'password_confirmation', 'company_id', 'isEdit', 'confirmedId']);
+        $this->reset(['managerId', 'name', 'email', 'phone', 'password', 'password_confirmation', 'selected_companies', 'isEdit', 'confirmedId', 'companySearch', 'filterCompany']);
     }
 
     public function showCreateManagerModal()
@@ -53,7 +60,8 @@ class CompanyManagers extends Component
             'name' => 'required|string|min:3',
             'email' => 'required|email|unique:users,email,' . ($this->managerId ? CompanyManager::find($this->managerId)?->user_id : 'NULL'),
             'phone' => 'nullable',
-            'company_id' => 'required|exists:companies,id',
+            'selected_companies' => 'required|array|min:1',
+            'selected_companies.*' => 'exists:companies,id,client_id,' . auth()->user()->client_id,
         ];
 
         if (!$this->isEdit) {
@@ -77,17 +85,18 @@ class CompanyManagers extends Component
                 'mobile' => $this->phone ?: null,
                 'password' => Hash::make($this->password),
                 'client_id' => auth()->user()->client_id,
-                'company_id' => $this->company_id,
+                'company_id' => $this->selected_companies[0] ?? null,
             ]);
 
             $user->assignRole('company');
 
-            CompanyManager::create([
-                'company_id' => $this->company_id,
+            $manager = CompanyManager::create([
                 'user_id' => $user->id,
                 'role' => 'company',
                 'status' => 'active',
             ]);
+
+            $manager->companies()->sync($this->selected_companies);
 
             DB::commit();
 
@@ -106,17 +115,17 @@ class CompanyManagers extends Component
         $this->isEdit = true;
         $this->managerId = $id;
 
-        $manager = CompanyManager::with('user')->findOrFail($id);
+        $manager = CompanyManager::with(['user', 'companies'])->findOrFail($id);
         
-        // Ensure isolation: manager's company must belong to current client
-        if ($manager->company->client_id !== auth()->user()->client_id) {
+        // Ensure isolation: manager must belong to current client (via user)
+        if ($manager->user->client_id !== auth()->user()->client_id) {
             abort(403);
         }
 
         $this->name = $manager->user->name;
         $this->email = $manager->user->email;
         $this->phone = $manager->user->mobile;
-        $this->company_id = $manager->company_id;
+        $this->selected_companies = $manager->companies->pluck('id')->toArray();
     }
 
     public function update()
@@ -126,7 +135,7 @@ class CompanyManagers extends Component
         $manager = CompanyManager::with('user')->findOrFail($this->managerId);
 
         // Ensure isolation
-        if ($manager->company->client_id !== auth()->user()->client_id) {
+        if ($manager->user->client_id !== auth()->user()->client_id) {
             abort(403);
         }
 
@@ -136,7 +145,7 @@ class CompanyManagers extends Component
                 'name' => $this->name,
                 'email' => $this->email,
                 'mobile' => $this->phone ?: null,
-                'company_id' => $this->company_id,
+                'company_id' => $this->selected_companies[0] ?? null,
             ];
 
             if ($this->password) {
@@ -145,9 +154,7 @@ class CompanyManagers extends Component
 
             $manager->user->update($userData);
 
-            $manager->update([
-                'company_id' => $this->company_id,
-            ]);
+            $manager->companies()->sync($this->selected_companies);
 
             DB::commit();
 
@@ -170,7 +177,7 @@ class CompanyManagers extends Component
         $manager = CompanyManager::with('user')->findOrFail($id);
 
         // Ensure isolation
-        if ($manager->company->client_id !== auth()->user()->client_id) {
+        if ($manager->user->client_id !== auth()->user()->client_id) {
             abort(403);
         }
 
@@ -194,18 +201,26 @@ class CompanyManagers extends Component
 
     public function render()
     {
-        $myCompanyIds = Company::where('client_id', auth()->user()->client_id)->pluck('id');
-
-        $managers = CompanyManager::whereIn('company_id', $myCompanyIds)
-            ->with(['user', 'company'])
-            ->whereHas('user', function ($query) {
-                $query->where('name', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('email', 'like', '%' . $this->searchTerm . '%');
+        $managers = CompanyManager::whereHas('user', function ($query) {
+                $query->where('client_id', auth()->user()->client_id)
+                    ->where(function($q) {
+                        $q->where('name', 'like', '%' . $this->searchTerm . '%')
+                          ->orWhere('email', 'like', '%' . $this->searchTerm . '%');
+                    });
             })
+            ->when($this->filterCompany, function ($query) {
+                $query->whereHas('companies', function ($q) {
+                    $q->where('companies.id', $this->filterCompany);
+                });
+            })
+            ->with(['user', 'companies'])
             ->paginate(10);
 
         $companies = Company::where('client_id', auth()->user()->client_id)
             ->where('is_active', true)
+            ->when($this->companySearch, function($query) {
+                $query->where('name', 'like', '%' . $this->companySearch . '%');
+            })
             ->get();
 
         return view('livewire.saa-s.company-managers', [

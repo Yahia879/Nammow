@@ -18,7 +18,7 @@ trait BelongsToCompany
 
                 if ($role === 'company') {
                     if (!$model->company_id) {
-                        $model->company_id = $user->companyManager->company_id ?? $user->company_id;
+                        $model->company_id = $user->company_id;
                     }
                 }
             }

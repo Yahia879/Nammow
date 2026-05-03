@@ -19,9 +19,9 @@ class CompanyScope implements Scope
             $role = $user->getRoleNames()->first();
 
             if ($role === 'company') {
-                $companyId = $user->company_id;
-                if ($companyId) {
-                    $builder->where($model->getTable() . '.company_id', $companyId);
+                $companyIds = $user->companyManager ? $user->companyManager->companies->pluck('id')->toArray() : [$user->company_id];
+                if (!empty($companyIds)) {
+                    $builder->whereIn($model->getTable() . '.company_id', $companyIds);
                 }
             }
         }

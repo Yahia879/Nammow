@@ -38,9 +38,9 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
 
-    public function managers(): HasMany
+    public function managers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->hasMany(CompanyManager::class);
+        return $this->belongsToMany(CompanyManager::class, 'company_manager_company');
     }
 
     public function employees(): HasMany

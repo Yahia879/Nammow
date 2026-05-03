@@ -16,7 +16,16 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                <div class="col-md-4 offset-md-8">
+                <div class="col-md-4">
+                    <label class="form-label">{{ __('الشركة') }}</label>
+                    <select wire:model.live="filterCompany" class="form-select">
+                        <option value="">{{ __('All') }}</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4 offset-md-4">
                     <label class="form-label">{{ __('Search') }}</label>
                     <input wire:model.live="searchTerm" type="text" class="form-control" placeholder="{{ __('Search (Name, Email...)') }}">
                 </div>
@@ -60,7 +69,9 @@
                             <span class="text-body">{{ $manager->user->mobile ?: '-' }}</span>
                         </td>
                         <td>
-                            <span class="badge bg-label-primary" title="{{ $manager->company->name }}">{{ Str::limit($manager->company->name, 20) }}</span>
+                            <span class="badge bg-label-primary" title="{{ $manager->companies->pluck('name')->implode('، ') }}">
+                                {{ $manager->companies->take(3)->pluck('name')->implode('، ') }}{{ $manager->companies->count() > 3 ? '...' : '' }}
+                            </span>
                         </td>
                         <td>
                             <span class="text-body">{{ $manager->created_at->format('Y-m-d') }}</span>
@@ -112,13 +123,23 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label">{{ __('company.company') }} <span class="text-danger">*</span></label>
-                                <select wire:model="company_id" class="form-select @error('company_id') is-invalid @enderror">
-                                    <option value="">{{ __('Select..') }}</option>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('company_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <div class="border rounded p-3">
+                                    <input wire:model.live="companySearch" type="text" class="form-control mb-2" placeholder="{{ __('Search Company...') }}">
+                                    <div style="max-height: 200px; overflow-y: auto;">
+                                        @foreach($companies as $company)
+                                            <div class="form-check mb-2">
+                                                <input wire:model="selected_companies" class="form-check-input" type="checkbox" value="{{ $company->id }}" id="company_{{ $company->id }}">
+                                                <label class="form-check-label" for="company_{{ $company->id }}">
+                                                    {{ $company->name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                        @if($companies->isEmpty())
+                                            <p class="text-muted small mb-0">{{ __('No companies found.') }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                @error('selected_companies') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">{{ __('Email') }} <span class="text-danger">*</span></label>

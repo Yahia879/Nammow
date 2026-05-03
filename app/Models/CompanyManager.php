@@ -11,15 +11,14 @@ class CompanyManager extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id',
         'user_id',
         'role',
         'status',
     ];
 
-    public function company(): BelongsTo
+    public function companies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsToMany(Company::class, 'company_manager_company');
     }
 
     public function user(): BelongsTo

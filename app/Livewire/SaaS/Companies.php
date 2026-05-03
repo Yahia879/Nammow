@@ -260,11 +260,12 @@ class Companies extends Component
                     // Assign role
                     $user->assignRole('company');
 
-                    CompanyManager::create([
-                        'company_id' => $company->id,
+                    $manager = CompanyManager::create([
                         'user_id' => $user->id,
                         'status' => 'active',
                     ]);
+
+                    $manager->companies()->attach($company->id);
                 }
             }
 
