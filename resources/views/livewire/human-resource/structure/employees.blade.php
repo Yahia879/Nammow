@@ -23,17 +23,27 @@
   </style>
 @endsection
 
-<div class="demo-inline-spacing">
-  <button wire:click='showCreateEmployeeModal' type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal">
-    <span class="ti-xs ti ti-plus me-1"></span>{{ __('Add New Employee') }}
-  </button>
-</div>
-<br>
+<h4 class="fw-bold py-3 mb-4">
+  <span class="text-muted fw-light">{{ __('Structure') }} /</span> {{ __('Employees') }}
+</h4>
+
 <div class="card">
-  <div class="card-header d-flex justify-content-between">
-    <h5 class="card-title m-0 me-2">{{ __('Employees') }}</h5>
-    <div class="col-4">
-      <input wire:model.live="searchTerm" autofocus type="text" class="form-control" placeholder="{{ __('Search (ID, Name...)') }}">
+  <div class="card-header border-bottom">
+    <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+      <div class="col-md-4">
+        <h5 class="card-title mb-0">{{ __('Employees') }}</h5>
+      </div>
+      <div class="col-md-8 text-end">
+        <button wire:click='showCreateEmployeeModal' type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal">
+          <i class="ti ti-plus me-1"></i> {{ __('Add New Employee') }}
+        </button>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+      <div class="col-md-4 offset-md-8">
+        <label class="form-label">{{ __('Search') }}</label>
+        <input wire:model.live="searchTerm" autofocus type="text" class="form-control" placeholder="{{ __('Search (ID, Name...)') }}">
+      </div>
     </div>
   </div>
   <div class="table-responsive text-nowrap">

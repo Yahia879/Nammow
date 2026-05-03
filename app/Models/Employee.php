@@ -20,6 +20,7 @@ class Employee extends Model
 
     protected $fillable = [
         'id',
+        'full_name',
         'company_id',
         'contract_id',
         'first_name',
@@ -32,6 +33,11 @@ class Employee extends Model
         'degree',
         'gender',
         'address',
+        'basic_salary',
+        'housing_allowance',
+        'transport_allowance',
+        'other_allowances',
+        'join_date',
         'notes',
         'balance_leave_allowed',
         'max_leave_allowed',
@@ -102,7 +108,7 @@ class Employee extends Model
     // 👉 Attributes
     public function getFullNameAttribute()
     {
-        return $this->first_name.' '.$this->last_name;
+        return $this->full_name ?? $this->first_name.' '.$this->last_name;
     }
 
     protected function birthAndPlace(): Attribute
