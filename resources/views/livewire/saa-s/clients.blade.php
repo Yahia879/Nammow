@@ -153,7 +153,7 @@
                     <form wire:submit.prevent="submit" class="row g-3">
                         <div class="col-12">
                             <label class="form-label">{{ __('Client Name') }}</label>
-                            <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('شركة النخبة للتقنية') }}">
+                            <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('فهد العتبي') }}">
                             @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-12">
