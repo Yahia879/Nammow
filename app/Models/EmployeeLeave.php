@@ -34,4 +34,9 @@ class EmployeeLeave extends Model
         'deleted_by',
         'deleted_at',
     ];
+
+    protected $casts = [
+        'from_date' => 'date',
+        'to_date' => 'date',
+    ];
 }

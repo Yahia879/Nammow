@@ -15,6 +15,7 @@ class EmployeesSeeder extends Seeder
         for ($i = 0; $i < 5; $i++) {
             Employee::create([
                 'contract_id' => rand(1, 2),
+                'join_date' => $faker->date(),
                 'first_name' => $faker->firstName,
                 'father_name' => $faker->lastName,
                 'last_name' => $faker->lastName,

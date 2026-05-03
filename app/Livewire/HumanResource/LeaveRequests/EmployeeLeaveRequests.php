@@ -71,9 +71,15 @@ class EmployeeLeaveRequests extends Component
             $query->where('reason', 'like', '%' . $this->search . '%');
         }
 
+        $minDate = Carbon::tomorrow()->toDateString();
+        $maxDate = Carbon::now()->endOfMonth()->toDateString();
+
         return view('livewire.human-resource.leave-requests.employee-leave-requests', [
+            'employee' => $employee,
             'leaveRequests' => $query->paginate(10),
             'leaveTypes' => LeaveType::where('is_active', true)->get(),
+            'minDate' => $minDate,
+            'maxDate' => $maxDate,
         ]);
     }
 
@@ -87,17 +93,44 @@ class EmployeeLeaveRequests extends Component
         $user = Auth::user();
         $employee = $user->employee;
 
+        $minDate = Carbon::tomorrow()->toDateString();
+        $maxDate = Carbon::now()->endOfMonth()->toDateString();
+
         $this->validate([
-            'new_leave_type_id' => 'required|exists:leave_types,id',
-            'new_start_date' => 'required|date',
-            'new_end_date' => 'required|date|after_or_equal:new_start_date',
+            'new_start_date' => "required|date|after_or_equal:$minDate|before_or_equal:$maxDate",
+            'new_end_date' => "required|date|after_or_equal:new_start_date|before_or_equal:$maxDate",
             'new_reason' => 'required|string|min:10',
         ]);
+
+        // Get Annual Leave Type
+        $annualLeaveType = LeaveType::where('name', 'Annual Leave')->first();
+        if (!$annualLeaveType) {
+            $this->dispatch('toastr', type: 'error', message: __('Annual Leave type not found.'));
+            return;
+        }
 
         // Calculate total days
         $start = Carbon::parse($this->new_start_date);
         $end = Carbon::parse($this->new_end_date);
         $totalDays = $start->diffInDays($end) + 1;
+
+        // Balance check for Annual Leave
+        $pendingDays = LeaveRequest::where('employee_id', $employee->id)
+            ->where('status', 'pending')
+            ->where('leave_type_id', $annualLeaveType->id)
+            ->sum('total_days');
+
+        $availableBalance = $employee->remaining_annual_leave_days - $pendingDays;
+
+        if ($availableBalance <= 0) {
+            $this->dispatch('toastr', type: 'error', message: __('You have no remaining annual leave balance.'));
+            return;
+        }
+
+        if ($totalDays > $availableBalance) {
+            $this->addError('new_end_date', __('Insufficient balance. You only have :balance days remaining (including pending requests).', ['balance' => $availableBalance]));
+            return;
+        }
 
         // Prevent overlapping
         $overlap = LeaveRequest::where('employee_id', $employee->id)
@@ -121,7 +154,7 @@ class EmployeeLeaveRequests extends Component
             'employee_id' => $employee->id,
             'company_id' => $employee->company_id,
             'client_id' => $user->client_id,
-            'leave_type_id' => $this->new_leave_type_id,
+            'leave_type_id' => $annualLeaveType->id,
             'start_date' => $this->new_start_date,
             'end_date' => $this->new_end_date,
             'total_days' => $totalDays,
@@ -129,7 +162,7 @@ class EmployeeLeaveRequests extends Component
             'status' => 'pending',
         ]);
 
-        $this->reset(['new_leave_type_id', 'new_start_date', 'new_end_date', 'new_reason']);
+        $this->reset(['new_start_date', 'new_end_date', 'new_reason']);
         $this->dispatch('closeModal', elementId: '#createLeaveModal');
         $this->dispatch('toastr', type: 'success', message: __('Leave request submitted successfully.'));
     }

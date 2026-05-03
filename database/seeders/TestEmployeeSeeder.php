@@ -19,9 +19,10 @@ class TestEmployeeSeeder extends Seeder
         $company = Company::where('client_id', $client->id)->first();
 
         // 1. Create the Employee record
-        $employee = Employee::firstOrCreate(['national_number' => '12345678'], [
+        $employee = Employee::updateOrCreate(['national_number' => '12345678'], [
             'company_id' => $company->id,
             'contract_id' => 1,
+            'join_date' => now()->startOfYear()->format('Y-m-d'),
             'first_name' => 'John',
             'father_name' => 'Doe',
             'last_name' => 'Employee',
@@ -35,6 +36,7 @@ class TestEmployeeSeeder extends Seeder
             'created_by' => 'System',
             'updated_by' => 'System',
             'is_active' => true,
+            'annual_leave_days' => 21,
         ]);
 
         // 2. Create the User account
@@ -51,5 +53,15 @@ class TestEmployeeSeeder extends Seeder
         if ($employeeRole) {
             $user->update(['role_id' => $employeeRole->id]);
         }
+
+        // 3. Create Timeline
+        \App\Models\Timeline::updateOrCreate(['employee_id' => $employee->id], [
+            'center_id' => 1,
+            'department_id' => 1,
+            'position_id' => 1,
+            'start_date' => now()->startOfYear()->format('Y-m-d'),
+            'created_by' => 'System',
+            'updated_by' => 'System',
+        ]);
     }
 }

@@ -528,5 +528,11 @@
     "view_employee_salary": "View Employee Salary",
     "view_my_salary": "View My Salary",
     "Employee salary not set. Cannot calculate percentage limit.": "Employee salary not set. Cannot calculate percentage limit.",
-    "Max advance amount allowed is :max (:percent% of salary)": "Max advance amount allowed is :max (:percent% of salary)"
+    "Max advance amount allowed is :max (:percent% of salary)": "Max advance amount allowed is :max (:percent% of salary)",
+    "Annual Leave Summary": "Annual Leave Summary",
+    "Earned": "Earned",
+    "Taken": "Taken",
+    "Remaining": "Remaining",
+    "Usage Ratio": "Usage Ratio",
+    "Days": "Days"
 }

@@ -92,6 +92,7 @@ class ManagerLeaveRequests extends Component
             'leaveTypes' => LeaveType::all(),
             'companies' => $companies,
             'employees' => $employees,
+            'selectedEmployee' => $this->employee_id ? Employee::find($this->employee_id) : null,
         ]);
     }
 
@@ -104,37 +105,40 @@ class ManagerLeaveRequests extends Component
     {
         $user = Auth::user();
 
-        // Clients can only review, not approve
-        if ($user->hasRole('client')) {
-            $this->dispatch('toastr', type: 'error', message: __('Unauthorized action. Clients can only review requests.'));
-            return;
-        }
+        $request = LeaveRequest::with(['leaveType', 'employee'])->findOrFail($id);
 
-        $request = LeaveRequest::findOrFail($id);
-
-        // Authorization check
+        // Strict Tenant Isolation
         if ($user->hasRole('company') && $request->company_id != $user->company_id) abort(403);
+        if ($user->hasRole('client') && $request->client_id != $user->client_id) abort(403);
 
-        $request->update([
+        $updateData = [
             'status' => 'approved',
             'decision_at' => now(),
-            'decision_by_type' => $user->hasAnyRole(['super_admin']) ? 'super_admin' : 'company_manager',
-            'decision_company_manager_id' => $user->id,
-        ]);
+        ];
+
+        if ($user->hasAnyRole(['super_admin'])) {
+            $updateData['decision_by_type'] = 'super_admin';
+            $updateData['decision_company_manager_id'] = $user->id;
+        } elseif ($user->hasRole('client')) {
+            $updateData['decision_by_type'] = 'client';
+            $updateData['decision_client_id'] = $user->id;
+        } else {
+            $updateData['decision_by_type'] = 'company_manager';
+            $updateData['decision_company_manager_id'] = $user->id;
+        }
+
+        $request->update($updateData);
+
+        // Deduct from annual leave balance if it's annual leave
+        if ($request->leaveType && $request->leaveType->name === 'Annual Leave') {
+            $request->employee->increment('taken_annual_leave_days', $request->total_days);
+        }
 
         $this->dispatch('toastr', type: 'success', message: __('Leave request approved.'));
     }
 
     public function openRejectModal($id)
     {
-        $user = Auth::user();
-
-        // Clients can only review, not reject
-        if ($user->hasRole('client')) {
-            $this->dispatch('toastr', type: 'error', message: __('Unauthorized action. Clients can only review requests.'));
-            return;
-        }
-
         $this->selected_request_id = $id;
         $this->rejection_reason = '';
         $this->dispatch('openModal', elementId: '#rejectModal');
@@ -144,28 +148,34 @@ class ManagerLeaveRequests extends Component
     {
         $user = Auth::user();
 
-        // Clients can only review, not reject
-        if ($user->hasRole('client')) {
-            $this->dispatch('toastr', type: 'error', message: __('Unauthorized action.'));
-            return;
-        }
-
         $this->validate([
             'rejection_reason' => 'required|string|min:5',
         ]);
 
         $request = LeaveRequest::findOrFail($this->selected_request_id);
 
-        // Authorization check
+        // Strict Tenant Isolation
         if ($user->hasRole('company') && $request->company_id != $user->company_id) abort(403);
+        if ($user->hasRole('client') && $request->client_id != $user->client_id) abort(403);
 
-        $request->update([
+        $updateData = [
             'status' => 'rejected',
             'rejection_reason' => $this->rejection_reason,
             'decision_at' => now(),
-            'decision_by_type' => $user->hasAnyRole(['super_admin']) ? 'super_admin' : 'company_manager',
-            'decision_company_manager_id' => $user->id,
-        ]);
+        ];
+
+        if ($user->hasAnyRole(['super_admin'])) {
+            $updateData['decision_by_type'] = 'super_admin';
+            $updateData['decision_company_manager_id'] = $user->id;
+        } elseif ($user->hasRole('client')) {
+            $updateData['decision_by_type'] = 'client';
+            $updateData['decision_client_id'] = $user->id;
+        } else {
+            $updateData['decision_by_type'] = 'company_manager';
+            $updateData['decision_company_manager_id'] = $user->id;
+        }
+
+        $request->update($updateData);
 
         $this->dispatch('closeModal', elementId: '#rejectModal');
         $this->dispatch('toastr', type: 'success', message: __('Leave request rejected.'));

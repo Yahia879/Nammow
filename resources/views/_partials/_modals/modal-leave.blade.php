@@ -5,7 +5,7 @@
   @endpush
 
   <div wire:ignore.self class="modal fade" id="leaveModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-simple">
+    <div class="modal-dialog modal-xl modal-simple modal-dialog-centered">
       <div class="modal-content p-0 p-md-5">
         <div class="modal-body">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -75,6 +75,10 @@
         if (typeof flatpickrDateFrom != undefined) {
           flatpickrDateFrom.flatpickr({
             dateFormat: "Y-m-d",
+            @if(!$isChecked)
+            minDate: "{{ $minDate }}",
+            maxDate: "{{ $maxDate }}",
+            @endif
           });
         }
       });
@@ -86,6 +90,10 @@
         if (typeof flatpickrDateTo != undefined) {
           flatpickrDateTo.flatpickr({
             dateFormat: "Y-m-d",
+            @if(!$isChecked)
+            minDate: "{{ $minDate }}",
+            maxDate: "{{ $maxDate }}",
+            @endif
           });
         }
       });

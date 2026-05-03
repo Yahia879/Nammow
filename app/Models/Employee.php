@@ -22,6 +22,7 @@ class Employee extends Model
         'id',
         'company_id',
         'contract_id',
+        'join_date',
         'first_name',
         'father_name',
         'last_name',
@@ -39,6 +40,8 @@ class Employee extends Model
         'hourly_counter',
         'is_active',
         'quit_date',
+        'annual_leave_days',
+        'taken_annual_leave_days',
     ];
 
     // 👉 Links
@@ -213,6 +216,52 @@ class Employee extends Model
         } else {
             return '---';
         }
+    }
+
+    public function getEarnedAnnualLeaveDaysAttribute()
+    {
+        $annual_leave_days = $this->annual_leave_days ?: 0;
+        $days_of_month = 30; // Default as requested
+
+        $joinDate = $this->join_date ? Carbon::parse($this->join_date) : null;
+        
+        if (!$joinDate) {
+            $joinDateRow = Timeline::where('employee_id', $this->id)->orderBy('start_date')->first();
+            if ($joinDateRow) {
+                $joinDate = Carbon::parse($joinDateRow->start_date);
+            }
+        }
+
+        $now = Carbon::now();
+        $currentMonth = $now->month;
+        $currentYear = $now->year;
+
+        if (!$joinDate) {
+            // If join_date is null: use 12 months as safe fallback
+            $number_of_months_worked = 12;
+        } else {
+            if ($joinDate->year < $currentYear) {
+                // If joined before current year: months from January to current month
+                $number_of_months_worked = $currentMonth;
+            } elseif ($joinDate->year == $currentYear) {
+                // If joined during current year: months from join_date month to current month
+                $number_of_months_worked = $currentMonth - $joinDate->month + 1;
+                $number_of_months_worked = max(0, $number_of_months_worked);
+            } else {
+                // Future join date
+                $number_of_months_worked = 0;
+            }
+        }
+
+        // Formula: (annual_leave_days / 12 / days_of_month * 30 * number_of_months_worked)
+        $earned = ($annual_leave_days / 12 / $days_of_month * 30 * $number_of_months_worked);
+
+        return (int) round($earned);
+    }
+
+    public function getRemainingAnnualLeaveDaysAttribute()
+    {
+        return (int) round($this->earned_annual_leave_days - $this->taken_annual_leave_days);
     }
 
     public function getEmployeePhoto()

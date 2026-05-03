@@ -692,5 +692,18 @@
     "Payroll History": "سجل الرواتب المدفوعة",
     "Calculated net pay for previous months": "صافي الراتب المحسوب للأشهر السابقة",
     "Actual Net Pay": "صافي الراتب الفعلي",
-    "Month": "الشهر"
+    "Month": "الشهر",
+    "Annual Leave Summary": "ملخص الإجازة السنوية",
+    "Earned": "المستحق",
+    "Taken": "المأخوذ",
+    "Remaining": "المتبقي",
+    "Usage Ratio": "نسبة الاستهلاك",
+    "Days": "أيام",
+    "You have no remaining annual leave balance.": "ليس لديك رصيد إجازات سنوية متبقي.",
+    "Insufficient balance. You only have :balance days remaining (including pending requests).": "الرصيد غير كافٍ. لديك فقط :balance أيام متبقية (بما في ذلك الطلبات المعلقة).",
+    "New Leave Request": "طلب إجازة جديد",
+    "Annual Leave type not found.": "نوع الإجازة السنوية غير موجود.",
+    "You won't be able to revert this!": "لن تتمكن من التراجع عن هذا!",
+    "Yes, delete it!": "نعم، احذفه!",
+    "Search employee name...": "ابحث عن اسم الموظف..."
 }
