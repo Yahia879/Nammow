@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Plan;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class PlanSeeder extends Seeder
 {
@@ -12,24 +13,23 @@ class PlanSeeder extends Seeder
      */
     public function run(): void
     {
-        Plan::firstOrCreate(['name' => 'Basic Plan'], [
-            'description' => 'Basic HR features',
-            'price' => 29.99,
-            'duration_days' => 30,
+        Schema::disableForeignKeyConstraints();
+        Plan::truncate();
+        Schema::enableForeignKeyConstraints();
+
+        Plan::create([
+            'name' => 'خطة النظام',
+            'description' => 'خطة النظام',
+            'price' => 0,
+            'duration_days' => 365,
             'status' => 'active',
         ]);
 
-        Plan::firstOrCreate(['name' => 'Professional Plan'], [
-            'description' => 'HR + companies management',
-            'price' => 99.99,
-            'duration_days' => 30,
-            'status' => 'active',
-        ]);
-
-        Plan::firstOrCreate(['name' => 'Enterprise Plan'], [
-            'description' => 'Full SaaS features',
-            'price' => 249.99,
-            'duration_days' => 30,
+        Plan::create([
+            'name' => 'خطة الموارد البشرية',
+            'description' => 'خطة الموارد البشرية',
+            'price' => 0,
+            'duration_days' => 365,
             'status' => 'active',
         ]);
     }
