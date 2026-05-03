@@ -16,6 +16,7 @@ class Client extends Model
         'slug',
         'email',
         'phone',
+        'id_number',
         'status',
         'plan_id',
         'is_active',

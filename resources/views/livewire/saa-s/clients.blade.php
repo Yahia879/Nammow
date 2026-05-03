@@ -153,6 +153,11 @@
                             @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-12">
+                            <label class="form-label">{{ __('ID Number') }}</label>
+                            <input wire:model="id_number" type="text" class="form-control @error('id_number') is-invalid @enderror" placeholder="{{ __('ID Number') }}">
+                            @error('id_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="col-12">
                             <label class="form-label">{{ __('Status') }}</label>
                             <select wire:model="status" class="form-select @error('status') is-invalid @enderror">
                                 <option value="active">{{ __('Active') }}</option>

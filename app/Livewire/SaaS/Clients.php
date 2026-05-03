@@ -29,6 +29,8 @@ class Clients extends Component
 
     public $phone;
 
+    public $id_number;
+
     public $status = 'active';
 
     public $plan_id;
@@ -50,6 +52,7 @@ class Clients extends Component
             'email' => 'required|email|unique:clients,email,'.$this->clientId.'|unique:users,email,'.($this->clientId ? User::where('client_id', $this->clientId)->first()?->id : 'NULL'),
             'status' => 'required|in:active,inactive,suspended,expired',
             'phone' => 'nullable',
+            'id_number' => 'required|string|max:50',
             'plan_id' => 'nullable|integer',
             'password' => $this->isEdit ? 'nullable|min:8|confirmed' : 'required|min:8|confirmed',
         ];
@@ -96,7 +99,7 @@ class Clients extends Component
 
     public function resetInputs()
     {
-        $this->reset(['clientId', 'name', 'email', 'phone', 'status', 'plan_id', 'password', 'password_confirmation', 'isEdit']);
+        $this->reset(['clientId', 'name', 'email', 'phone', 'id_number', 'status', 'plan_id', 'password', 'password_confirmation', 'isEdit']);
         $this->status = 'active';
     }
 
@@ -116,6 +119,7 @@ class Clients extends Component
         $this->name = $client->name;
         $this->email = $client->email;
         $this->phone = $client->phone;
+        $this->id_number = $client->id_number;
         $this->status = $client->status;
         $this->plan_id = $client->plan_id;
     }
@@ -135,6 +139,7 @@ class Clients extends Component
                 'slug' => Str::slug($this->name),
                 'email' => $this->email,
                 'phone' => $this->phone,
+                'id_number' => $this->id_number,
                 'status' => $this->status,
                 'plan_id' => $this->plan_id,
                 'is_active' => true,
@@ -168,6 +173,7 @@ class Clients extends Component
                 'slug' => Str::slug($this->name),
                 'email' => $this->email,
                 'phone' => $this->phone,
+                'id_number' => $this->id_number,
                 'status' => $this->status,
                 'plan_id' => $this->plan_id,
             ]);
