@@ -210,7 +210,7 @@ $configData = Helper::appClasses();
 
         <div class="hero-section text-center">
           <div class="hero-logo">
-            <img src="{{ asset('assets/img/logo/logo_128.png') }}" alt="HRMS Logo" width="50">
+            <img src="{{ asset('assets/img/logo/icon.png') }}" alt="HRMS Logo" width="70">
           </div>
           <h1 class="hero-title display-5">{{ __('login.title') }}</h1>
           <h2 class="hero-subtitle h5">{{ __('login.hero_subtitle') }}</h2>

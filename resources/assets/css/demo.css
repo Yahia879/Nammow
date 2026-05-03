@@ -4,11 +4,11 @@
 ******************************************************************************/
 
 .light-style .menu .app-brand.demo {
-  height: 64px;
+  height: 80px;
 }
 
 .dark-style .menu .app-brand.demo {
-  height: 64px;
+  height: 80px;
 }
 
 .app-brand-logo.demo {
@@ -18,6 +18,21 @@
   justify-content: center;
   display: -ms-flexbox;
   display: flex;
+}
+
+.menu-vertical .app-brand-logo.demo {
+  width: 40px !important;
+  height: 40px !important;
+  overflow: visible;
+}
+
+.menu-vertical .app-brand-logo.demo img {
+  width: 40px !important;
+  height: auto !important;
+  object-fit: contain;
+}
+
+:not(.menu-vertical) .app-brand-logo.demo {
   width: 34px;
   height: 24px;
 }

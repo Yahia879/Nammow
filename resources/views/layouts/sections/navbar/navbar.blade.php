@@ -70,7 +70,9 @@
                       John Doe
                     @endif
                   </span>
-                  <small class="text-muted">Admin</small>
+                  <small class="text-muted">
+                    {{ auth()->user()->companyManager->companies->first()->name ?? '-' }}
+                  </small>
                 </div>
               </div>
             </a>

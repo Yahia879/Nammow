@@ -18,8 +18,23 @@ class Employee extends Model
 {
     use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($employee) {
+            $latestEmployee = static::withoutGlobalScopes()->orderBy('employee_id', 'desc')->whereNotNull('employee_id')->first();
+            if (! $latestEmployee) {
+                $employee->employee_id = 'EMP-0001';
+            } else {
+                $number = intval(substr($latestEmployee->employee_id, 4)) + 1;
+                $employee->employee_id = 'EMP-'.str_pad($number, 4, '0', STR_PAD_LEFT);
+            }
+        });
+    }
+
     protected $fillable = [
-        'id',
+        'employee_id',
         'full_name',
         'company_id',
         'contract_id',
@@ -45,6 +60,10 @@ class Employee extends Model
         'hourly_counter',
         'is_active',
         'quit_date',
+    ];
+
+    protected $casts = [
+        'mobile_number' => 'integer',
     ];
 
     // 👉 Links
@@ -105,17 +124,22 @@ class Employee extends Model
         return $this->hasMany(Discount::class);
     }
 
-    // 👉 Attributes
-    public function getFullNameAttribute()
+    public function transitions(): HasMany
     {
-        return $this->full_name ?? $this->first_name.' '.$this->last_name;
+        return $this->hasMany(Transition::class);
+    }
+
+    // 👉 Attributes
+    public function getFullNameAttribute($value)
+    {
+        return $value ?? $this->first_name.' '.$this->last_name;
     }
 
     protected function birthAndPlace(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => ucfirst($value),
-            set: fn (string $value) => ucfirst($value)
+            get: fn ($value) => $value ? ucfirst($value) : null,
+            set: fn ($value) => $value ? ucfirst($value) : null
         );
     }
 

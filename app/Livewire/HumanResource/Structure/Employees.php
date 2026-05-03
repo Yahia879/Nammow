@@ -4,6 +4,9 @@ namespace App\Livewire\HumanResource\Structure;
 
 use App\Models\Contract;
 use App\Models\Employee;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -48,9 +51,8 @@ class Employees extends Component
     public function submitEmployee()
     {
         $this->validate([
-            'employeeInfo.id' => 'required',
-            'employeeInfo.fullName' => 'required',
-            'employeeInfo.mobileNumber' => 'required|min:9|max:9|regex:/^[1-9][0-9]*$/',
+            'employeeInfo.fullName' => 'required|string',
+            'employeeInfo.mobileNumber' => 'required|numeric',
             'employeeInfo.basicSalary' => 'required|numeric',
             'employeeInfo.housingAllowance' => 'required|numeric',
             'employeeInfo.transportAllowance' => 'required|numeric',
@@ -59,7 +61,11 @@ class Employees extends Component
             'employeeInfo.annualLeaveDays' => 'required|integer',
             'employeeInfo.gender' => 'required',
             'employeeInfo.address' => 'nullable',
+            'employeeInfo.email' => 'nullable|email|unique:users,email,'.($this->isEdit ? $this->employee->user?->id : 'NULL'),
+            'employeeInfo.password' => $this->isEdit ? 'nullable' : 'required|min:8|confirmed',
         ]);
+
+        $this->employeeInfo['mobileNumber'] = (int) $this->employeeInfo['mobileNumber'];
 
         $this->isEdit ? $this->editEmployee() : $this->addEmployee();
     }
@@ -72,27 +78,43 @@ class Employees extends Component
 
     public function addEmployee()
     {
-        $createdEmployee = Employee::create([
-            'id' => $this->employeeInfo['id'],
-            'full_name' => $this->employeeInfo['fullName'],
-            'mobile_number' => $this->employeeInfo['mobileNumber'],
-            'basic_salary' => $this->employeeInfo['basicSalary'],
-            'housing_allowance' => $this->employeeInfo['housingAllowance'],
-            'transport_allowance' => $this->employeeInfo['transportAllowance'],
-            'other_allowances' => $this->employeeInfo['otherAllowances'],
-            'join_date' => $this->employeeInfo['joinDate'],
-            'max_leave_allowed' => $this->employeeInfo['annualLeaveDays'],
-            'gender' => $this->employeeInfo['gender'],
-            'address' => $this->employeeInfo['address'] ?? null,
-            'profile_photo_path' => 'profile-photos/.default-photo.jpg',
-        ]);
+        DB::beginTransaction();
 
-        $this->dispatch('closeModal', elementId: '#employeeModal');
-        $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        try {
+            $createdEmployee = Employee::create([
+                'full_name' => $this->employeeInfo['fullName'],
+                'mobile_number' => $this->employeeInfo['mobileNumber'],
+                'basic_salary' => $this->employeeInfo['basicSalary'],
+                'housing_allowance' => $this->employeeInfo['housingAllowance'],
+                'transport_allowance' => $this->employeeInfo['transportAllowance'],
+                'other_allowances' => $this->employeeInfo['otherAllowances'],
+                'join_date' => $this->employeeInfo['joinDate'],
+                'max_leave_allowed' => $this->employeeInfo['annualLeaveDays'],
+                'gender' => $this->employeeInfo['gender'],
+                'address' => $this->employeeInfo['address'] ?? null,
+                'profile_photo_path' => 'profile-photos/.default-photo.jpg',
+            ]);
 
-        session()->flash('openTimelineModal', true);
+            $userEmail = $this->employeeInfo['email'] ?? 'emp-'.$createdEmployee->id.'@system.com';
 
-        return redirect()->route('structure-employees-info', ['id' => $createdEmployee->id]);
+            $user = User::create([
+                'name' => $this->employeeInfo['fullName'],
+                'employee_id' => $createdEmployee->id,
+                'email' => $userEmail,
+                'password' => Hash::make($this->employeeInfo['password']),
+            ]);
+
+            $user->assignRole('employee');
+
+            DB::commit();
+
+            $this->reset('employeeInfo');
+            $this->dispatch('closeModal', elementId: '#employeeModal');
+            $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     // 👉 Update employee
@@ -102,7 +124,6 @@ class Employees extends Component
 
         $this->employee = $employee;
 
-        $this->employeeInfo['id'] = $employee->id;
         $this->employeeInfo['fullName'] = $employee->full_name;
         $this->employeeInfo['mobileNumber'] = $employee->mobile_number;
         $this->employeeInfo['basicSalary'] = $employee->basic_salary;
@@ -113,26 +134,47 @@ class Employees extends Component
         $this->employeeInfo['annualLeaveDays'] = $employee->max_leave_allowed;
         $this->employeeInfo['gender'] = $employee->gender;
         $this->employeeInfo['address'] = $employee->address;
+        $this->employeeInfo['email'] = $employee->user?->email;
     }
 
     public function editEmployee()
     {
-        $this->employee->update([
-            'id' => $this->employeeInfo['id'],
-            'full_name' => $this->employeeInfo['fullName'],
-            'mobile_number' => $this->employeeInfo['mobileNumber'],
-            'basic_salary' => $this->employeeInfo['basicSalary'],
-            'housing_allowance' => $this->employeeInfo['housingAllowance'],
-            'transport_allowance' => $this->employeeInfo['transportAllowance'],
-            'other_allowances' => $this->employeeInfo['otherAllowances'],
-            'join_date' => $this->employeeInfo['joinDate'],
-            'max_leave_allowed' => $this->employeeInfo['annualLeaveDays'],
-            'gender' => $this->employeeInfo['gender'],
-            'address' => $this->employeeInfo['address'] ?? null,
-        ]);
+        DB::beginTransaction();
 
-        $this->dispatch('closeModal', elementId: '#employeeModal');
-        $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        try {
+            $this->employee->update([
+                'full_name' => $this->employeeInfo['fullName'],
+                'mobile_number' => $this->employeeInfo['mobileNumber'],
+                'basic_salary' => $this->employeeInfo['basicSalary'],
+                'housing_allowance' => $this->employeeInfo['housingAllowance'],
+                'transport_allowance' => $this->employeeInfo['transportAllowance'],
+                'other_allowances' => $this->employeeInfo['otherAllowances'],
+                'join_date' => $this->employeeInfo['joinDate'],
+                'max_leave_allowed' => $this->employeeInfo['annualLeaveDays'],
+                'gender' => $this->employeeInfo['gender'],
+                'address' => $this->employeeInfo['address'] ?? null,
+            ]);
+
+            if ($this->employee->user) {
+                $userData = [
+                    'name' => $this->employeeInfo['fullName'],
+                ];
+
+                if (isset($this->employeeInfo['email'])) {
+                    $userData['email'] = $this->employeeInfo['email'];
+                }
+
+                $this->employee->user->update($userData);
+            }
+
+            DB::commit();
+
+            $this->dispatch('closeModal', elementId: '#employeeModal');
+            $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     // 👉 Delete employee

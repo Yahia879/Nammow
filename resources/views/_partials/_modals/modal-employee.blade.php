@@ -23,21 +23,22 @@
         </div>
         <form wire:submit="submitEmployee" class="row g-3">
           {{-- ID and Full Name --}}
+          @if($isEdit)
           <div class="col-md-4 col-12 mb-2">
-            <label class="form-label">{{ __('ID') }}</label>
-            <input wire:model='employeeInfo.id' @if($isEdit) disabled @endif class="form-control @error('employeeInfo.id') is-invalid @enderror" type="number"/>
-            @error('employeeInfo.id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            <label class="form-label">{{ __('Identifier') }}</label>
+            <input value="{{ $employee->employee_id }}" class="form-control" type="text" disabled/>
           </div>
-          <div class="col-md-8 col-12 mb-2">
+          @endif
+          <div class="col-md-{{ $isEdit ? '8' : '12' }} col-12 mb-2">
             <label class="form-label">{{ __('Full Name') }}</label>
-            <input wire:model='employeeInfo.fullName' class="form-control @error('employeeInfo.fullName') is-invalid @enderror" type="text" placeholder="{{ __('الاسم الكامل') }}"/>
+            <input wire:model='employeeInfo.fullName' class="form-control @error('employeeInfo.fullName') is-invalid @enderror" type="text" placeholder="{{ __('فهد العتيبي') }}"/>
             @error('employeeInfo.fullName') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
 
           {{-- Mobile and Gender --}}
           <div class="col-md-6 col-12 mb-2">
             <label class="form-label">{{ __('Mobile') }}</label>
-            <input wire:model.defer="employeeInfo.mobileNumber" class="form-control @error('employeeInfo.mobileNumber') is-invalid @enderror" placeholder="900000000" type="text" maxlength="9">
+            <input wire:model.defer="employeeInfo.mobileNumber" class="form-control @error('employeeInfo.mobileNumber') is-invalid @enderror" placeholder="{{ __('Enter phone number') }}" type="text">
             @error('employeeInfo.mobileNumber') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
           <div class="col-md-6 col-12 mb-2">
@@ -53,24 +54,24 @@
           {{-- Basic Salary and Housing Allowance --}}
           <div class="col-md-6 col-12 mb-2">
             <label class="form-label">{{ __('Basic Salary') }}</label>
-            <input wire:model.defer='employeeInfo.basicSalary' class="form-control @error('employeeInfo.basicSalary') is-invalid @enderror" type="number" step="0.01"/>
+            <input wire:model.defer='employeeInfo.basicSalary' class="form-control @error('employeeInfo.basicSalary') is-invalid @enderror" type="number" step="0.01" placeholder="5000"/>
             @error('employeeInfo.basicSalary') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
           <div class="col-md-6 col-12 mb-2">
             <label class="form-label">{{ __('Housing Allowance') }}</label>
-            <input wire:model.defer='employeeInfo.housingAllowance' class="form-control @error('employeeInfo.housingAllowance') is-invalid @enderror" type="number" step="0.01"/>
+            <input wire:model.defer='employeeInfo.housingAllowance' class="form-control @error('employeeInfo.housingAllowance') is-invalid @enderror" type="number" step="0.01" placeholder="1500"/>
             @error('employeeInfo.housingAllowance') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
 
           {{-- Transport Allowance and Other Allowances --}}
           <div class="col-md-6 col-12 mb-2">
             <label class="form-label">{{ __('Transport Allowance') }}</label>
-            <input wire:model.defer='employeeInfo.transportAllowance' class="form-control @error('employeeInfo.transportAllowance') is-invalid @enderror" type="number" step="0.01"/>
+            <input wire:model.defer='employeeInfo.transportAllowance' class="form-control @error('employeeInfo.transportAllowance') is-invalid @enderror" type="number" step="0.01" placeholder="500"/>
             @error('employeeInfo.transportAllowance') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
           <div class="col-md-6 col-12 mb-2">
             <label class="form-label">{{ __('Other Allowances') }}</label>
-            <input wire:model.defer='employeeInfo.otherAllowances' class="form-control @error('employeeInfo.otherAllowances') is-invalid @enderror" type="number" step="0.01"/>
+            <input wire:model.defer='employeeInfo.otherAllowances' class="form-control @error('employeeInfo.otherAllowances') is-invalid @enderror" type="number" step="0.01" placeholder="0"/>
             @error('employeeInfo.otherAllowances') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
 
@@ -85,6 +86,25 @@
             <input wire:model.defer='employeeInfo.annualLeaveDays' class="form-control @error('employeeInfo.annualLeaveDays') is-invalid @enderror" type="number"/>
             @error('employeeInfo.annualLeaveDays') <div class="invalid-feedback">{{ $message }}</div> @enderror
           </div>
+
+          {{-- User Account Fields --}}
+          <div class="col-md-{{ $isEdit ? '12' : '4' }} col-12 mb-2">
+            <label class="form-label">{{ __('Email') }}</label>
+            <input wire:model.defer='employeeInfo.email' class="form-control @error('employeeInfo.email') is-invalid @enderror" type="email" placeholder="example@mail.com"/>
+            @error('employeeInfo.email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+          </div>
+
+          @if(!$isEdit)
+          <div class="col-md-4 col-12 mb-2">
+            <label class="form-label">{{ __('Password') }}</label>
+            <input wire:model.defer='employeeInfo.password' class="form-control @error('employeeInfo.password') is-invalid @enderror" type="password" placeholder="············"/>
+            @error('employeeInfo.password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+          </div>
+          <div class="col-md-4 col-12 mb-2">
+            <label class="form-label">{{ __('Confirm Password') }}</label>
+            <input wire:model.defer='employeeInfo.password_confirmation' class="form-control" type="password" placeholder="············"/>
+          </div>
+          @endif
 
           {{-- Address --}}
           <div class="col-12 mb-4">
