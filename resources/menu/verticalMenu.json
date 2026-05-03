@@ -64,7 +64,7 @@
     },
     {
       "menuHeader": "Human resource",
-      "role": ["-company"]
+      "role": ["company"]
     },
     {
       "name": "Attendance",
@@ -90,7 +90,7 @@
       "name": "Structure",
       "icon": "menu-icon tf-icons ti ti-hierarchy",
       "slug": "structure",
-      "role": ["-company"],
+      "role": ["company"],
       "submenu": [
         {
           "url": "structure/centers",
@@ -114,7 +114,7 @@
           "url": "structure/employees",
           "name": "Employees",
           "slug": "structure-employees",
-          "role": ["-company"]
+          "role": ["company"]
         }
       ]
     },

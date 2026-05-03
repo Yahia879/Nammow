@@ -52,14 +52,9 @@
         <tr>
           <td>{{ $employee->id }}</td>
           <td>
-            <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
-              <li class="avatar avatar-xs pull-up">
-                <a href="{{ route('structure-employees-info', $employee->id) }}">
-                  <img src="{{ Storage::disk("public")->url($employee->profile_photo_path) }}" alt="Avatar" class="rounded-circle">
-                  {{ $employee->full_name }}
-                </a>
-              </li>
-            </ul>
+            <a href="{{ route('structure-employees-info', $employee->id) }}">
+              {{ $employee->full_name }}
+            </a>
           </td>
           <td style="direction: ltr">{{ '+963 ' . number_format($employee->mobile_number, 0, '', ' ') }}</td>
           <td>
@@ -92,9 +87,6 @@
                 <button class="btn btn-label-primary mb-4" data-bs-toggle="modal" data-bs-target="#employeeModal">
                     {{ __('Add New Employee') }}
                   </button>
-                <div>
-                  <img src="{{ asset('assets/img/illustrations/page-misc-under-maintenance.png') }}" width="200" class="img-fluid">
-                </div>
             </div>
           </td>
         </tr>
