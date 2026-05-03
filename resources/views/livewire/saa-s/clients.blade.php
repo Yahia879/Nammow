@@ -1,17 +1,4 @@
 <div>
-    @section('page-style')
-    <style>
-        .btn-tr {
-            opacity: 0;
-        }
-
-        tr:hover .btn-tr {
-            display: inline-block;
-            opacity: 1;
-        }
-    </style>
-    @endsection
-
     <h4 class="fw-bold py-3 mb-4">
         <span class="text-muted fw-light">{{ __('Client Management') }} /</span> {{ __('Clients') }}
     </h4>
@@ -112,13 +99,12 @@
                             <span class="text-body">{{ $client->created_at->format('Y-m-d') }}</span>
                         </td>
                         <td>
-                            <div class="d-flex align-items-center">
-                                <button wire:click="editClient({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect me-1" data-bs-toggle="modal" data-bs-target="#clientModal">
-                                    <i class="ti ti-pencil ti-sm"></i>
-                                </button>
-                                <button wire:click="confirmDelete({{ $client->id }})" type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-danger waves-effect" data-bs-toggle="modal" data-bs-target="#deleteClientModal">
-                                    <i class="ti ti-trash ti-sm"></i>
-                                </button>
+                            <div class="d-inline-block text-nowrap">
+                                <button class="btn btn-sm btn-icon btn-label-secondary rounded-pill waves-effect dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-sm"></i></button>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    <a href="javascript:void(0);" wire:click="editClient({{ $client->id }})" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#clientModal">{{ __('Edit') }}</a>
+                                    <a href="javascript:void(0);" wire:click="confirmDelete({{ $client->id }})" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteClientModal">{{ __('Delete') }}</a>
+                                </div>
                             </div>
                         </td>
                     </tr>
