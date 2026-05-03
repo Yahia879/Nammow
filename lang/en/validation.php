@@ -179,6 +179,17 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'Company Name',
+        'owner_name' => 'Owner Name',
+        'cr_number' => 'Commercial Registration Number',
+        'unified_number' => 'Unified Number',
+        'attestation_date' => 'Approval Date',
+        'attestation_expiry_date' => 'Approval Expiry Date',
+        'cr_image' => 'Commercial Registration Image',
+        'email' => 'Email',
+        'phone' => 'Phone',
+        'address' => 'Address',
+    ],
 
 ];

@@ -25,12 +25,17 @@ class Companies extends Component
     // Form properties
     public $companyId;
     public $name;
+    public $owner_name;
+    public $cr_number;
+    public $unified_number;
+    public $attestation_date;
+    public $attestation_expiry_date;
     public $email;
     public $phone;
     public $address;
     public $status = 'active';
-    public $logo;
-    public $existingLogo;
+    public $cr_image;
+    public $existingCrImage;
 
     // Multi-Manager properties
     public $managers = [];
@@ -48,11 +53,15 @@ class Companies extends Component
     {
         $rules = [
             'name' => 'required|string|min:3',
-            'email' => 'nullable|email',
-            'phone' => 'nullable',
+            'owner_name' => 'required|string|min:3',
+            'cr_number' => 'required|string',
+            'unified_number' => 'required|string',
+            'attestation_date' => 'required|date',
+            'attestation_expiry_date' => 'required|date',
+            'email' => 'required|email',
+            'phone' => 'required',
             'address' => 'nullable',
-            'status' => 'required|in:active,inactive',
-            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cr_image' => ($this->isEdit ? 'nullable' : 'required') . '|mimes:jpg,jpeg,png,webp,pdf|max:5120',
         ];
 
         foreach ($this->managers as $index => $manager) {
@@ -111,7 +120,7 @@ class Companies extends Component
 
     public function resetInputs()
     {
-        $this->reset(['companyId', 'name', 'email', 'phone', 'address', 'status', 'logo', 'existingLogo', 'isEdit', 'managers', 'activeTab']);
+        $this->reset(['companyId', 'name', 'owner_name', 'cr_number', 'unified_number', 'attestation_date', 'attestation_expiry_date', 'email', 'phone', 'address', 'status', 'cr_image', 'existingCrImage', 'isEdit', 'managers', 'activeTab']);
         $this->status = 'active';
         $this->activeTab = 'company-info';
         $this->addManager();
@@ -132,11 +141,16 @@ class Companies extends Component
         $company = Company::where('client_id', auth()->user()->client_id)->with('managers.user')->findOrFail($id);
         
         $this->name = $company->name;
+        $this->owner_name = $company->owner_name;
+        $this->cr_number = $company->cr_number;
+        $this->unified_number = $company->unified_number;
+        $this->attestation_date = $company->attestation_date;
+        $this->attestation_expiry_date = $company->attestation_expiry_date;
         $this->email = $company->email;
         $this->phone = $company->phone;
         $this->address = $company->address;
         $this->status = $company->status;
-        $this->existingLogo = $company->logo;
+        $this->existingCrImage = $company->cr_image;
 
         // Load existing managers
         $this->managers = [];
@@ -167,19 +181,24 @@ class Companies extends Component
 
         DB::beginTransaction();
         try {
-            $logoPath = null;
-            if ($this->logo) {
-                $logoPath = $this->logo->store('company-logos', 'public');
+            $crImagePath = null;
+            if ($this->cr_image) {
+                $crImagePath = $this->cr_image->store('company-cr-images', 'public');
             }
 
             $company = Company::create([
                 'client_id' => auth()->user()->client_id,
                 'name' => $this->name,
+                'owner_name' => $this->owner_name,
+                'cr_number' => $this->cr_number,
+                'unified_number' => $this->unified_number,
+                'attestation_date' => $this->attestation_date,
+                'attestation_expiry_date' => $this->attestation_expiry_date,
                 'email' => $this->email,
                 'phone' => $this->phone,
                 'address' => $this->address,
                 'status' => $this->status,
-                'logo' => $logoPath,
+                'cr_image' => $crImagePath,
                 'is_active' => true,
             ]);
 
@@ -224,18 +243,23 @@ class Companies extends Component
         try {
             $data = [
                 'name' => $this->name,
+                'owner_name' => $this->owner_name,
+                'cr_number' => $this->cr_number,
+                'unified_number' => $this->unified_number,
+                'attestation_date' => $this->attestation_date,
+                'attestation_expiry_date' => $this->attestation_expiry_date,
                 'email' => $this->email,
                 'phone' => $this->phone,
                 'address' => $this->address,
                 'status' => $this->status,
             ];
 
-            if ($this->logo) {
-                // Delete old logo if it exists
-                if ($company->logo) {
-                    Storage::disk('public')->delete($company->logo);
+            if ($this->cr_image) {
+                // Delete old image if it exists
+                if ($company->cr_image) {
+                    Storage::disk('public')->delete($company->cr_image);
                 }
-                $data['logo'] = $this->logo->store('company-logos', 'public');
+                $data['cr_image'] = $this->cr_image->store('company-cr-images', 'public');
             }
 
             $company->update($data);

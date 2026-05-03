@@ -14,6 +14,12 @@ class Company extends Model
     protected $fillable = [
         'client_id',
         'name',
+        'owner_name',
+        'cr_number',
+        'unified_number',
+        'attestation_date',
+        'attestation_expiry_date',
+        'cr_image',
         'email',
         'phone',
         'logo',

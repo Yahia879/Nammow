@@ -187,5 +187,12 @@ return [
         'status' => 'الحالة',
         'phone' => 'الهاتف',
         'plan_id' => 'خطة الاشتراك',
+        'owner_name' => 'اسم المالك',
+        'cr_number' => 'رقم السجل التجاري',
+        'unified_number' => 'الرقم الموحد',
+        'attestation_date' => 'تاريخ التأييد',
+        'attestation_expiry_date' => 'تاريخ انتهاء التأييد',
+        'cr_image' => 'صورة السجل التجاري',
+        'address' => 'العنوان',
     ],
 ];

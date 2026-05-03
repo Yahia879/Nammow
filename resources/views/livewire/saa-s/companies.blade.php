@@ -16,15 +16,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                <div class="col-md-3">
-                    <label class="form-label">{{ __('Status') }}</label>
-                    <select wire:model.live="filterStatus" class="form-select text-capitalize">
-                        <option value="">{{ __('Show All') }}</option>
-                        <option value="active">{{ __('Active') }}</option>
-                        <option value="inactive">{{ __('Inactive') }}</option>
-                    </select>
-                </div>
-                <div class="col-md-4 offset-md-5">
+                <div class="col-md-4 offset-md-8">
                     <label class="form-label">{{ __('Search') }}</label>
                     <input wire:model.live="searchTerm" type="text" class="form-control" placeholder="{{ __('Search (Name, Email...)') }}">
                 </div>
@@ -34,11 +26,12 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{{ __('Company') }}</th>
-                        <th>{{ __('Status') }}</th>
-                        <th>{{ __('Address') }}</th>
+                        <th>{{ __('Company Name') }}</th>
+                        <th>{{ __('company.cr_number') }}</th>
+                        <th>{{ __('company.unified_number') }}</th>
+                        <th>{{ __('company.approval_expiry_date') }}</th>
                         <th>{{ __('Managers') }}</th>
-                        <th>{{ __('Joined') }}</th>
+                        <th>{{ __('Created At') }}</th>
                         <th>{{ __('Actions') }}</th>
                     </tr>
                 </thead>
@@ -49,8 +42,8 @@
                             <div class="d-flex justify-content-start align-items-center">
                                 <div class="avatar-wrapper">
                                     <div class="avatar avatar-sm me-3">
-                                        @if($company->logo)
-                                            <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="rounded-circle">
+                                        @if($company->cr_image && Str::endsWith($company->cr_image, ['.jpg', '.jpeg', '.png', '.webp']))
+                                            <img src="{{ asset('storage/' . $company->cr_image) }}" alt="CR Image" class="rounded-circle">
                                         @else
                                             <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($company->name, 0, 2) }}</span>
                                         @endif
@@ -63,21 +56,28 @@
                             </div>
                         </td>
                         <td>
-                            @php
-                                $statusClass = [
-                                    'active' => 'success',
-                                    'inactive' => 'secondary',
-                                ][$company->status] ?? 'primary';
-                            @endphp
-                            <span class="badge bg-label-{{ $statusClass }}">
-                                {{ __($company->status) }}
-                            </span>
+                            <span class="text-body">{{ $company->cr_number }}</span>
                         </td>
                         <td>
-                            <div class="d-flex flex-column">
-                                <span class="text-body">{{ $company->address ?? '-' }}</span>
-                                <small class="text-muted">{{ $company->phone }}</small>
-                            </div>
+                            <span class="text-body">{{ $company->unified_number }}</span>
+                        </td>
+                        <td>
+                            @php
+                                $expiryDate = \Carbon\Carbon::parse($company->attestation_expiry_date);
+                                $isExpired = $expiryDate->isPast();
+                                $daysRemaining = now()->diffInDays($expiryDate, false);
+                                $isExpiringSoon = !$isExpired && $daysRemaining <= 30;
+                                
+                                $badgeClass = 'bg-label-success';
+                                if ($isExpired) {
+                                    $badgeClass = 'bg-label-danger';
+                                } elseif ($isExpiringSoon) {
+                                    $badgeClass = 'bg-label-warning';
+                                }
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">
+                                {{ $company->attestation_expiry_date }}
+                            </span>
                         </td>
                         <td>
                             <span class="badge rounded-pill bg-label-info">{{ $company->managers_count }}</span>
@@ -97,7 +97,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center">
+                        <td colspan="5" class="text-center">
                             <div class="mt-4 mb-4">
                                 <h5 class="mb-1">{{ __('No Companies Found') }}</h5>
                             </div>
@@ -151,7 +151,7 @@
                             <li class="nav-item">
                                 <button x-on:click="activeTab = 'company-info'" type="button" class="nav-link" :class="{ 'active': activeTab === 'company-info' }" role="tab">
                                     <i class="ti ti-building me-1"></i> {{ __('Company Info') }}
-                                    @if($errors->has('name') || $errors->has('email') || $errors->has('phone') || $errors->has('address') || $errors->has('status') || $errors->has('logo'))
+                                    @if($errors->has('name') || $errors->has('owner_name') || $errors->has('cr_number') || $errors->has('unified_number') || $errors->has('attestation_date') || $errors->has('attestation_expiry_date') || $errors->has('email') || $errors->has('phone') || $errors->has('address') || $errors->has('cr_image'))
                                         <span class="badge badge-dot bg-danger"></span>
                                     @endif
                                 </button>
@@ -170,18 +170,43 @@
                                 <!-- Company Info Tab -->
                                 <div class="tab-pane fade" :class="{ 'show active': activeTab === 'company-info' }" id="navs-company-info" role="tabpanel">
                                     <div class="row g-3">
-                                        <div class="col-12">
-                                            <label class="form-label">{{ __('Company Name') }}</label>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ __('Company Name') }} <span class="text-danger">*</span></label>
                                             <input wire:model="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="{{ __('Company Name') }}">
                                             @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ __('company.owner_name') }} <span class="text-danger">*</span></label>
+                                            <input wire:model="owner_name" type="text" class="form-control @error('owner_name') is-invalid @enderror" placeholder="{{ __('company.owner_name') }}">
+                                            @error('owner_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ __('company.cr_number') }} <span class="text-danger">*</span></label>
+                                            <input wire:model="cr_number" type="text" class="form-control @error('cr_number') is-invalid @enderror" placeholder="1010XXXXXX">
+                                            @error('cr_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ __('company.unified_number') }} <span class="text-danger">*</span></label>
+                                            <input wire:model="unified_number" type="text" class="form-control @error('unified_number') is-invalid @enderror" placeholder="700XXXXXXX">
+                                            @error('unified_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ __('company.approval_date') }} <span class="text-danger">*</span></label>
+                                            <input wire:model="attestation_date" type="date" class="form-control @error('attestation_date') is-invalid @enderror">
+                                            @error('attestation_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{{ __('company.approval_expiry_date') }} <span class="text-danger">*</span></label>
+                                            <input wire:model="attestation_expiry_date" type="date" class="form-control @error('attestation_expiry_date') is-invalid @enderror">
+                                            @error('attestation_expiry_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                        </div>
                                         <div class="col-12 col-md-6">
-                                            <label class="form-label">{{ __('Email') }}</label>
+                                            <label class="form-label">{{ __('Email') }} <span class="text-danger">*</span></label>
                                             <input wire:model="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="info@company.com">
                                             @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                         <div class="col-12 col-md-6">
-                                            <label class="form-label">{{ __('Phone') }}</label>
+                                            <label class="form-label">{{ __('company.phone') }} <span class="text-danger">*</span></label>
                                             <input wire:model="phone" type="text" class="form-control @error('phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX">
                                             @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
@@ -191,21 +216,28 @@
                                             @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                         </div>
                                         <div class="col-12">
-                                            <label class="form-label">{{ __('Status') }}</label>
-                                            <select wire:model="status" class="form-select @error('status') is-invalid @enderror">
-                                                <option value="active">{{ __('Active') }}</option>
-                                                <option value="inactive">{{ __('Inactive') }}</option>
-                                            </select>
-                                            @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label">{{ __('Logo') }}</label>
-                                            <input wire:model="logo" type="file" class="form-control @error('logo') is-invalid @enderror" accept="image/png, image/jpeg, image/webp">
-                                            <div class="form-text">{{ __('Allowed formats: JPG, PNG, WEBP') }}</div>
-                                            @error('logo') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                                            @if ($logo && !$errors->has('logo'))
+                                            <label class="form-label">{{ __('company.cr_image') }} <span class="text-danger">*</span></label>
+                                            <input wire:model="cr_image" type="file" class="form-control @error('cr_image') is-invalid @enderror" accept="image/png, image/jpeg, image/webp, application/pdf">
+                                            <div class="form-text">{{ __('company.allowed_formats') }}</div>
+                                            @error('cr_image') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                                            @if ($cr_image && !$errors->has('cr_image'))
                                                 <div class="mt-2 text-center">
-                                                    <img src="{{ $logo->temporaryUrl() }}" width="100" class="rounded border">
+                                                    @if(Str::endsWith($cr_image->getClientOriginalName(), '.pdf'))
+                                                        <i class="ti ti-file-description ti-xl text-primary"></i>
+                                                        <p>{{ $cr_image->getClientOriginalName() }}</p>
+                                                    @else
+                                                        <img src="{{ $cr_image->temporaryUrl() }}" width="100" class="rounded border">
+                                                    @endif
+                                                </div>
+                                            @elseif($existingCrImage)
+                                                <div class="mt-2 text-center">
+                                                    @if(Str::endsWith($existingCrImage, '.pdf'))
+                                                        <a href="{{ asset('storage/' . $existingCrImage) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            <i class="ti ti-file-description me-1"></i> {{ __('View Current CR Document') }}
+                                                        </a>
+                                                    @else
+                                                        <img src="{{ asset('storage/' . $existingCrImage) }}" width="100" class="rounded border">
+                                                    @endif
                                                 </div>
                                             @endif
                                         </div>
