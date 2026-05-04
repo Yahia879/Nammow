@@ -29,11 +29,11 @@
     @php
       $canAction = !isset($menu->action) || auth()->user()->canAction($menu->action);
       $isSuperAdmin = auth()->user()->hasRole('super_admin');
-      $isClientsManagement = isset($menu->slug) && $menu->slug === 'super-admin-clients';
+      $isAllowedItem = isset($menu->slug) && in_array($menu->slug, ['super-admin.dashboard', 'super-admin-clients']);
 
       $showItem = $canAction;
       if (file_exists(public_path('mix-manifest.json')) && $isSuperAdmin) {
-        $showItem = $isClientsManagement;
+        $showItem = $isAllowedItem;
       }
     @endphp
 

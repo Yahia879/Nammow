@@ -6,11 +6,11 @@
     @php
       $canAction = !isset($submenu->action) || auth()->user()->canAction($submenu->action);
       $isSuperAdmin = auth()->user()->hasRole('super_admin');
-      $isClientsManagement = isset($submenu->slug) && $submenu->slug === 'super-admin-clients';
+      $isAllowedItem = isset($submenu->slug) && in_array($submenu->slug, ['super-admin.dashboard', 'super-admin-clients']);
 
       $showItem = $canAction;
       if (file_exists(public_path('mix-manifest.json')) && $isSuperAdmin) {
-        $showItem = $isClientsManagement;
+        $showItem = $isAllowedItem;
       }
 
       $activeClass = null;
