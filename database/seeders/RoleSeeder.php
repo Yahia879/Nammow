@@ -16,6 +16,7 @@ class RoleSeeder extends Seeder
                 'view_clients', 'create_clients', 'edit_clients', 'delete_clients',
                 'manage_settings',
                 'view_companies', 'create_companies', 'edit_companies', 'delete_companies',
+                'view_company_managers',
                 'view_leaves', 'manage_leave_requests',
                 'view_holidays', 'create_holidays', 'edit_holidays', 'delete_holidays',
                 'manage_advances',
@@ -26,6 +27,7 @@ class RoleSeeder extends Seeder
             'client' => [
                 'view_dashboard_client',
                 'view_companies', 'create_companies', 'edit_companies', 'delete_companies',
+                'view_company_managers',
                 'view_leaves', 'manage_leave_requests',
                 'view_holidays', 'create_holidays', 'edit_holidays', 'delete_holidays',
                 'view_client_advances',

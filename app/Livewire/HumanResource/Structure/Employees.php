@@ -104,7 +104,11 @@ class Employees extends Component
                 'password' => Hash::make($this->employeeInfo['password']),
             ]);
 
-            $user->assignRole('employee');
+            // Assign role
+            $employeeRole = \App\Models\Role::where('name', 'employee')->first();
+            if ($employeeRole) {
+                $user->update(['role_id' => $employeeRole->id]);
+            }
 
             DB::commit();
 

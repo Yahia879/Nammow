@@ -97,7 +97,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center">
+                        <td colspan="7" class="text-center">
                             <div class="mt-4 mb-4">
                                 <h5 class="mb-1">{{ __('No Companies Found') }}</h5>
                             </div>

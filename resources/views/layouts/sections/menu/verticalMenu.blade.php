@@ -27,13 +27,21 @@
     @foreach ($menuData->menu as $menu)
 
     @php
-      $canAction = !isset($menu->action) || auth()->user()->canAction($menu->action);
       $isSuperAdmin = auth()->user()->hasRole('super_admin');
-      $isAllowedItem = isset($menu->slug) && in_array($menu->slug, ['super-admin.dashboard', 'super-admin-clients']);
+      $isClient = auth()->user()->hasRole('client');
 
-      $showItem = $canAction;
-      if (file_exists(public_path('mix-manifest.json')) && $isSuperAdmin) {
-        $showItem = $isAllowedItem;
+      // HARD WHITELIST FOR CLIENT ROLE
+      if ($isClient) {
+        $showItem = isset($menu->slug) && str_starts_with($menu->slug, 'client.');
+      }
+      // HARD WHITELIST FOR SUPER ADMIN (if manifest exists)
+      elseif ($isSuperAdmin && file_exists(public_path('mix-manifest.json'))) {
+        $allowedSuperAdminSlugs = ['super-admin.dashboard', 'super-admin-clients'];
+        $showItem = isset($menu->slug) && in_array($menu->slug, $allowedSuperAdminSlugs);
+      }
+      // DEFAULT LOGIC FOR OTHER ROLES
+      else {
+        $showItem = !isset($menu->action) || auth()->user()->canAction($menu->action);
       }
     @endphp
 

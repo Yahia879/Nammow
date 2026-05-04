@@ -25,6 +25,7 @@ class ActionSeeder extends Seeder
             ['name' => 'create_companies', 'group' => 'companies'],
             ['name' => 'edit_companies', 'group' => 'companies'],
             ['name' => 'delete_companies', 'group' => 'companies'],
+            ['name' => 'view_company_managers', 'group' => 'companies'],
             
             // HR (Company Level)
             ['name' => 'view_employees', 'group' => 'employees'],

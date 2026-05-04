@@ -88,7 +88,11 @@ class CompanyManagers extends Component
                 'company_id' => $this->selected_companies[0] ?? null,
             ]);
 
-            $user->assignRole('company');
+            // Assign role
+            $companyRole = \App\Models\Role::where('name', 'company')->first();
+            if ($companyRole) {
+                $user->update(['role_id' => $companyRole->id]);
+            }
 
             $manager = CompanyManager::create([
                 'user_id' => $user->id,

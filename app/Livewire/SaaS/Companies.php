@@ -214,7 +214,10 @@ class Companies extends Component
                 ]);
 
                 // Assign role
-                $user->assignRole('company');
+                $companyRole = \App\Models\Role::where('name', 'company')->first();
+                if ($companyRole) {
+                    $user->update(['role_id' => $companyRole->id]);
+                }
 
                 CompanyManager::create([
                     'company_id' => $company->id,

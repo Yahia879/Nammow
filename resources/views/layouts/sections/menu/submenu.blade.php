@@ -4,13 +4,21 @@
 
     {{-- active menu method --}}
     @php
-      $canAction = !isset($submenu->action) || auth()->user()->canAction($submenu->action);
       $isSuperAdmin = auth()->user()->hasRole('super_admin');
-      $isAllowedItem = isset($submenu->slug) && in_array($submenu->slug, ['super-admin.dashboard', 'super-admin-clients']);
+      $isClient = auth()->user()->hasRole('client');
 
-      $showItem = $canAction;
-      if (file_exists(public_path('mix-manifest.json')) && $isSuperAdmin) {
-        $showItem = $isAllowedItem;
+      // HARD WHITELIST FOR CLIENT ROLE
+      if ($isClient) {
+        $showItem = isset($submenu->slug) && str_starts_with($submenu->slug, 'client.');
+      }
+      // HARD WHITELIST FOR SUPER ADMIN (if manifest exists)
+      elseif ($isSuperAdmin && file_exists(public_path('mix-manifest.json'))) {
+        $allowedSuperAdminSlugs = ['super-admin.dashboard', 'super-admin-clients'];
+        $showItem = isset($submenu->slug) && in_array($submenu->slug, $allowedSuperAdminSlugs);
+      }
+      // DEFAULT LOGIC FOR OTHER ROLES
+      else {
+        $showItem = !isset($submenu->action) || auth()->user()->canAction($submenu->action);
       }
 
       $activeClass = null;
