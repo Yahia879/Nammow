@@ -124,6 +124,7 @@ class Employees extends Component
                 'other_allowances' => $this->employeeInfo['otherAllowances'],
                 'join_date' => $this->employeeInfo['joinDate'],
                 'max_leave_allowed' => $this->employeeInfo['annualLeaveDays'],
+                'annual_leave_days' => $this->employeeInfo['annualLeaveDays'],
                 'gender' => $this->employeeInfo['gender'],
                 'address' => $this->employeeInfo['address'] ?? null,
                 'profile_photo_path' => 'profile-photos/.default-photo.jpg',
@@ -169,7 +170,7 @@ class Employees extends Component
         $this->employeeInfo['transportAllowance'] = $employee->transport_allowance;
         $this->employeeInfo['otherAllowances'] = $employee->other_allowances;
         $this->employeeInfo['joinDate'] = $employee->join_date;
-        $this->employeeInfo['annualLeaveDays'] = $employee->max_leave_allowed;
+        $this->employeeInfo['annualLeaveDays'] = $employee->annual_leave_days ?: $employee->max_leave_allowed;
         $this->employeeInfo['gender'] = $employee->gender;
         $this->employeeInfo['address'] = $employee->address;
         $this->employeeInfo['email'] = $employee->user?->email;
@@ -189,6 +190,7 @@ class Employees extends Component
                 'other_allowances' => $this->employeeInfo['otherAllowances'],
                 'join_date' => $this->employeeInfo['joinDate'],
                 'max_leave_allowed' => $this->employeeInfo['annualLeaveDays'],
+                'annual_leave_days' => $this->employeeInfo['annualLeaveDays'],
                 'gender' => $this->employeeInfo['gender'],
                 'address' => $this->employeeInfo['address'] ?? null,
             ]);

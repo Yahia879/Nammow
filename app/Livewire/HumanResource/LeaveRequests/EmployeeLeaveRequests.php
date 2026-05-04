@@ -150,10 +150,18 @@ class EmployeeLeaveRequests extends Component
             return;
         }
 
+        // Get safe client_id
+        $clientId = $employee->client_id ?? $employee->company?->client_id ?? $user->client_id;
+
+        if (!$clientId) {
+            $this->dispatch('toastr', type: 'error', message: __('Unable to identify your client account. Please contact support.'));
+            return;
+        }
+
         LeaveRequest::create([
             'employee_id' => $employee->id,
             'company_id' => $employee->company_id,
-            'client_id' => $user->client_id,
+            'client_id' => $clientId,
             'leave_type_id' => $annualLeaveType->id,
             'start_date' => $this->new_start_date,
             'end_date' => $this->new_end_date,

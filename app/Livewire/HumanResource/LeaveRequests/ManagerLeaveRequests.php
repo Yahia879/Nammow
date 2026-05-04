@@ -21,7 +21,6 @@ class ManagerLeaveRequests extends Component
     public $leave_type_id = '';
     public $date_from = '';
     public $date_to = '';
-    public $decision_by_type = '';
     public $search = '';
 
     // Action Form
@@ -35,7 +34,6 @@ class ManagerLeaveRequests extends Component
         'leave_type_id' => ['except' => ''],
         'date_from' => ['except' => ''],
         'date_to' => ['except' => ''],
-        'decision_by_type' => ['except' => ''],
         'search' => ['except' => ''],
     ];
 
@@ -63,7 +61,6 @@ class ManagerLeaveRequests extends Component
         if ($this->leave_type_id) $query->where('leave_type_id', $this->leave_type_id);
         if ($this->date_from) $query->where('start_date', '>=', $this->date_from);
         if ($this->date_to) $query->where('end_date', '<=', $this->date_to);
-        if ($this->decision_by_type) $query->where('decision_by_type', $this->decision_by_type);
         if ($this->search) {
             $query->whereHas('employee', function ($q) {
                 $q->where('first_name', 'like', '%' . $this->search . '%')
@@ -98,7 +95,7 @@ class ManagerLeaveRequests extends Component
 
     public function resetFilters()
     {
-        $this->reset(['status', 'employee_id', 'company_id', 'leave_type_id', 'date_from', 'date_to', 'decision_by_type', 'search']);
+        $this->reset(['status', 'employee_id', 'company_id', 'leave_type_id', 'date_from', 'date_to', 'search']);
     }
 
     public function approveRequest($id)

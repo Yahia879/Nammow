@@ -94,7 +94,7 @@
                                 </select>
                             </div>
                         @endif
-                        <div class="col-md-2">
+                        <div class="col-md-{{ Auth::user()->hasRole('company') ? '4' : '3' }}">
                             <label class="form-label small">{{ __('Employee') }}</label>
                             <select wire:model.live="employee_id" class="form-select form-select-sm">
                                 <option value="">{{ __('All Employees') }}</option>
@@ -103,16 +103,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label small">{{ __('Decision By') }}</label>
-                            <select wire:model.live="decision_by_type" class="form-select form-select-sm">
-                                <option value="">{{ __('All Types') }}</option>
-                                <option value="company_manager">{{ __('Company Manager') }}</option>
-                                <option value="client">{{ __('Client') }}</option>
-                                <option value="super_admin">{{ __('Super Admin') }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
+                        <div class="col-md-{{ Auth::user()->hasRole('company') ? '5' : '4' }}">
                             <label class="form-label small">{{ __('Search') }}</label>
                             <div class="input-group input-group-merge">
                                 <span class="input-group-text"><i class="ti ti-search ti-xs"></i></span>
