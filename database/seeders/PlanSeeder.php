@@ -13,24 +13,37 @@ class PlanSeeder extends Seeder
      */
     public function run(): void
     {
+        // To strictly follow the requirement of "Delete all current records from the plans table"
+        // we can truncate, but to make it idempotent and safe for existing subscriptions, 
+        // we should ideally keep the IDs or handle them. 
+        // However, the user explicitly asked to "Delete all current records".
+        
         Schema::disableForeignKeyConstraints();
         Plan::truncate();
         Schema::enableForeignKeyConstraints();
 
-        Plan::create([
-            'name' => 'خطة النظام',
-            'description' => 'خطة النظام',
-            'price' => 0,
-            'duration_days' => 365,
-            'status' => 'active',
-        ]);
+        $plans = [
+            [
+                'name' => 'خطة النظام',
+                'description' => 'خطة النظام',
+                'price' => 0,
+                'duration_days' => 365,
+                'status' => 'active',
+            ],
+            [
+                'name' => 'خطة الموارد البشرية',
+                'description' => 'خطة الموارد البشرية',
+                'price' => 0,
+                'duration_days' => 365,
+                'status' => 'active',
+            ],
+        ];
 
-        Plan::create([
-            'name' => 'خطة الموارد البشرية',
-            'description' => 'خطة الموارد البشرية',
-            'price' => 0,
-            'duration_days' => 365,
-            'status' => 'active',
-        ]);
+        foreach ($plans as $plan) {
+            Plan::updateOrCreate(
+                ['name' => $plan['name']],
+                $plan
+            );
+        }
     }
 }
