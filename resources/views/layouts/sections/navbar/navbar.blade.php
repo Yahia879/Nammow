@@ -71,7 +71,19 @@
                     @endif
                   </span>
                   <small class="text-muted">
-                    {{ auth()->user()->companyManager->companies->first()->name ?? '-' }}
+                    @if(Auth::check())
+                      @if(Auth::user()->hasRole('company'))
+                        {{ \App\Models\Company::find(session('active_company_id'))->name ?? (Auth::user()->companyManager->companies->first()->name ?? '-') }}
+                      @elseif(Auth::user()->hasRole('super_admin'))
+                        {{ __('Super Admin') }}
+                      @elseif(Auth::user()->hasRole('client'))
+                        {{ Auth::user()->client->name ?? __('Client') }}
+                      @elseif(Auth::user()->hasRole('employee'))
+                        {{ Auth::user()->company->name ?? __('Employee') }}
+                      @else
+                        {{ Auth::user()->role->name ?? '-' }}
+                      @endif
+                    @endif
                   </small>
                 </div>
               </div>
@@ -80,6 +92,17 @@
           <li>
             <div class="dropdown-divider"></div>
           </li>
+          @if(Auth::check() && Auth::user()->hasRole('company') && Auth::user()->companyManager && Auth::user()->companyManager->companies->count() > 1)
+          <li>
+            <a class="dropdown-item" href="{{ route('select-company') }}">
+              <i class="ti ti-arrows-exchange me-2 ti-sm"></i>
+              <span class="align-middle">{{ __('Switch Company') }}</span>
+            </a>
+          </li>
+          <li>
+            <div class="dropdown-divider"></div>
+          </li>
+          @endif
           <li>
             <a class="dropdown-item" href="{{ Route::has('profile.show') ? route('profile.show') : 'javascript:void(0);' }}">
               <i class="ti ti-user-check me-2 ti-sm"></i>

@@ -135,8 +135,8 @@
                                         <td>
                                             <div class="d-flex justify-content-start align-items-center">
                                                 <div class="d-flex flex-column">
-                                                    <span class="fw-bold">{{ $request->employee->full_name }}</span>
-                                                    <small class="text-muted">{{ $request->employee->mobile_number }}</small>
+                                                    <span class="fw-bold">{{ $request->employee->full_name ?? __('Unknown Employee') }}</span>
+                                                    <small class="text-muted">{{ $request->employee->mobile_number ?? '-' }}</small>
                                                 </div>
                                             </div>
                                         </td>

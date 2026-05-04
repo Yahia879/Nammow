@@ -141,7 +141,7 @@ class Clients extends Component
                 'phone' => $this->phone,
                 'id_number' => $this->id_number,
                 'status' => $this->status,
-                'plan_id' => $this->plan_id,
+                'plan_id' => $this->plan_id ?: null,
                 'is_active' => true,
             ]);
 
@@ -178,7 +178,7 @@ class Clients extends Component
                 'phone' => $this->phone,
                 'id_number' => $this->id_number,
                 'status' => $this->status,
-                'plan_id' => $this->plan_id,
+                'plan_id' => $this->plan_id ?: null,
             ]);
 
             $user = User::where('client_id', $this->clientId)->first();

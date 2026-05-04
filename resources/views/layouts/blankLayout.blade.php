@@ -15,6 +15,11 @@
 
   <!-- Content -->
   @yield('content')
+
+  {{-- Support for Livewire components --}}
+  @isset($slot)
+    {{ $slot }}
+  @endisset
   <!--/ Content -->
 
 @endsection

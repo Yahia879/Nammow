@@ -19,6 +19,13 @@ class CompanyScope implements Scope
             $role = $user->role->name ?? null;
 
             if ($role === 'company') {
+                // Check for active session company first
+                if (session()->has('active_company_id')) {
+                    $builder->where($model->getTable() . '.company_id', session('active_company_id'));
+                    return;
+                }
+
+                // Fallback to all managed companies
                 $companyIds = $user->companyManager ? $user->companyManager->companies->pluck('id')->toArray() : [$user->company_id];
                 if (!empty($companyIds)) {
                     $builder->whereIn($model->getTable() . '.company_id', $companyIds);

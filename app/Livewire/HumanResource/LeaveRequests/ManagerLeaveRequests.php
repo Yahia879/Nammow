@@ -40,7 +40,9 @@ class ManagerLeaveRequests extends Component
     public function render()
     {
         $user = Auth::user();
-        $query = LeaveRequest::with(['employee', 'company', 'leaveType'])
+        $query = LeaveRequest::with(['employee' => function($q) {
+            $q->withTrashed();
+        }, 'company', 'leaveType'])
             ->latest();
 
         // Strict Tenant Isolation
@@ -49,7 +51,8 @@ class ManagerLeaveRequests extends Component
         } elseif ($user->hasRole('client')) {
             $query->where('client_id', $user->client_id);
         } elseif ($user->hasRole('company')) {
-            $query->where('company_id', $user->company_id);
+            $activeCompanyId = session('active_company_id') ?? $user->company_id;
+            $query->where('company_id', $activeCompanyId);
         } else {
             abort(403);
         }
@@ -81,7 +84,8 @@ class ManagerLeaveRequests extends Component
                 $q->where('client_id', $user->client_id);
             })->get();
         } elseif ($user->hasRole('company')) {
-            $employees = Employee::where('company_id', $user->company_id)->get();
+            $activeCompanyId = session('active_company_id') ?? $user->company_id;
+            $employees = Employee::where('company_id', $activeCompanyId)->get();
         }
 
         return view('livewire.human-resource.leave-requests.manager-leave-requests', [
@@ -105,7 +109,10 @@ class ManagerLeaveRequests extends Component
         $request = LeaveRequest::with(['leaveType', 'employee'])->findOrFail($id);
 
         // Strict Tenant Isolation
-        if ($user->hasRole('company') && $request->company_id != $user->company_id) abort(403);
+        if ($user->hasRole('company')) {
+            $managedCompanyIds = $user->companyManager ? $user->companyManager->companies->pluck('id')->toArray() : [$user->company_id];
+            if (!in_array($request->company_id, $managedCompanyIds)) abort(403);
+        }
         if ($user->hasRole('client') && $request->client_id != $user->client_id) abort(403);
 
         $updateData = [
@@ -127,7 +134,7 @@ class ManagerLeaveRequests extends Component
         $request->update($updateData);
 
         // Deduct from annual leave balance if it's annual leave
-        if ($request->leaveType && $request->leaveType->name === 'Annual Leave') {
+        if ($request->leaveType && $request->leaveType->name === 'Annual Leave' && $request->employee) {
             $request->employee->increment('taken_annual_leave_days', $request->total_days);
         }
 
@@ -152,7 +159,10 @@ class ManagerLeaveRequests extends Component
         $request = LeaveRequest::findOrFail($this->selected_request_id);
 
         // Strict Tenant Isolation
-        if ($user->hasRole('company') && $request->company_id != $user->company_id) abort(403);
+        if ($user->hasRole('company')) {
+            $managedCompanyIds = $user->companyManager ? $user->companyManager->companies->pluck('id')->toArray() : [$user->company_id];
+            if (!in_array($request->company_id, $managedCompanyIds)) abort(403);
+        }
         if ($user->hasRole('client') && $request->client_id != $user->client_id) abort(403);
 
         $updateData = [

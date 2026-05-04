@@ -73,7 +73,7 @@ Route::middleware([
     });
 
     // 👉 Company Routes
-    Route::group(['prefix' => 'company'], function () {
+    Route::group(['prefix' => 'company', 'middleware' => ['ensure.active.company']], function () {
         Route::get('/dashboard', Dashboard::class)->middleware('check.action:view_dashboard_company')->name('company.dashboard');
         Route::get('/leaves', ManagerLeaveRequests::class)->middleware('check.action:view_leaves')->name('company.leaves');
         Route::get('/holidays', HolidayManagement::class)->middleware('check.action:view_holidays')->name('company.holidays');
@@ -81,6 +81,8 @@ Route::middleware([
         Route::get('/advances/settings', \App\Livewire\HumanResource\Advances\AdvanceSettings::class)->middleware('check.action:manage_advance_settings')->name('company.advances.settings');
         Route::get('/salaries', \App\Livewire\HumanResource\Salary\SalaryManagement::class)->middleware('check.action:view_employee_salary')->name('company.salaries');
     });
+
+    Route::get('/select-company', \App\Livewire\SaaS\CompanySelection::class)->name('select-company');
 
     // 👉 Employee Routes
     Route::group(['prefix' => 'employee'], function () {

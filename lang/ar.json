@@ -336,6 +336,7 @@
   "Under Development": "قيد التطوير",
   "Under Maintenance!": "الموقع تحت الصيانة حالياً",
   "Unknown": "غير معروف",
+  "Unknown Employee": "موظف غير معروف",
   "Unpaid leave": "إجازة بلا راتب",
   "Update Asset": "تعديل الأصل",
   "Update Category": "تعديل فئة",
@@ -725,5 +726,11 @@
   "You won't be able to revert this!": "لن تتمكن من التراجع عن هذا!",
   "Yes, delete it!": "نعم، احذفه!",
   "Search employee name...": "ابحث عن اسم الموظف...",
-  "Created At": "تاريخ الإنشاء"
+  "Created At": "تاريخ الإنشاء",
+  "Select": "اختيار",
+  "Owner:": "المالك:",
+  "Select the company you want to manage": "اختر الشركة التي تريد إدارتها",
+  "Please choose a company to continue": "يرجى اختيار شركة للمتابعة",
+  "اختر الشركة التي تريد إدارتها": "اختر الشركة التي تريد إدارتها",
+  "يرجى اختيار شركة لمتابعة العمل": "يرجى اختيار شركة لمتابعة العمل"
 }

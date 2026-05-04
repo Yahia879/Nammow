@@ -69,6 +69,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.action' => \App\Http\Middleware\CheckAction::class,
         'role_redirect' => \App\Http\Middleware\CheckRoleOrRedirect::class,
+        'ensure.active.company' => \App\Http\Middleware\EnsureActiveCompany::class,
         'view_logs' => \App\Http\Middleware\ViewLogs::class,
     ];
 }

@@ -19,7 +19,19 @@ class HomeController extends Controller
         }
 
         if ($user->hasRole('company')) {
-            return redirect('/company/dashboard');
+            $managedCompanies = $user->companyManager ? $user->companyManager->companies : collect();
+
+            if ($managedCompanies->count() === 1) {
+                session(['active_company_id' => $managedCompanies->first()->id]);
+                return redirect('/company/dashboard');
+            }
+
+            if ($managedCompanies->count() > 1) {
+                return redirect()->route('select-company');
+            }
+
+            // Fallback for company managers with no companies
+            return redirect('/dashboard')->with('error', __('No companies assigned to your account.'));
         }
 
         if ($user->hasRole('employee')) {
