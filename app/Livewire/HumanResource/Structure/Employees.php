@@ -61,13 +61,47 @@ class Employees extends Component
             'employeeInfo.annualLeaveDays' => 'required|integer',
             'employeeInfo.gender' => 'required',
             'employeeInfo.address' => 'nullable',
-            'employeeInfo.email' => 'nullable|email|unique:users,email,'.($this->isEdit ? $this->employee->user?->id : 'NULL'),
+            'employeeInfo.email' => 'required|email|unique:users,email,'.($this->isEdit ? $this->employee->user?->id : 'NULL'),
             'employeeInfo.password' => $this->isEdit ? 'nullable' : 'required|min:8|confirmed',
         ]);
 
         $this->employeeInfo['mobileNumber'] = (int) $this->employeeInfo['mobileNumber'];
 
         $this->isEdit ? $this->editEmployee() : $this->addEmployee();
+    }
+
+    protected function validationAttributes()
+    {
+        return [
+            'employeeInfo.fullName' => __('الاسم الكامل'),
+            'employeeInfo.mobileNumber' => __('رقم الجوال'),
+            'employeeInfo.basicSalary' => __('الراتب الأساسي'),
+            'employeeInfo.housingAllowance' => __('بدل السكن'),
+            'employeeInfo.transportAllowance' => __('بدل النقل'),
+            'employeeInfo.otherAllowances' => __('البدلات الأخرى'),
+            'employeeInfo.joinDate' => __('تاريخ الالتحاق'),
+            'employeeInfo.annualLeaveDays' => __('عدد الإجازات السنوية'),
+            'employeeInfo.gender' => __('الجنس'),
+            'employeeInfo.email' => __('البريد الإلكتروني'),
+            'employeeInfo.password' => __('كلمة المرور'),
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'employeeInfo.fullName.required' => __('الاسم الكامل مطلوب'),
+            'employeeInfo.mobileNumber.required' => __('رقم الجوال مطلوب'),
+            'employeeInfo.basicSalary.required' => __('الراتب الأساسي مطلوب'),
+            'employeeInfo.housingAllowance.required' => __('بدل السكن مطلوب'),
+            'employeeInfo.transportAllowance.required' => __('بدل النقل مطلوب'),
+            'employeeInfo.otherAllowances.required' => __('البدلات الأخرى مطلوبة'),
+            'employeeInfo.joinDate.required' => __('تاريخ الالتحاق مطلوب'),
+            'employeeInfo.annualLeaveDays.required' => __('عدد الإجازات السنوية مطلوب'),
+            'employeeInfo.gender.required' => __('الجنس مطلوب'),
+            'employeeInfo.email.required' => __('البريد الإلكتروني مطلوب'),
+            'employeeInfo.password.required' => __('كلمة المرور مطلوبة'),
+        ];
     }
 
     // 👉 Store employee

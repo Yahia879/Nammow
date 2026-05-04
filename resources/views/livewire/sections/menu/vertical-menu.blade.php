@@ -25,14 +25,36 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-      @foreach ($menuData->menu as $menu)
+      @php
+        $menus = $menuData->menu;
+        if (auth()->user()->hasRole('company')) {
+          $order = ['company-dashboard', 'structure', 'company-leaves'];
+          $orderedMenus = [];
+          foreach ($order as $slug) {
+            foreach ($menus as $menuItem) {
+              if (isset($menuItem->slug) && $menuItem->slug === $slug) {
+                $orderedMenus[] = $menuItem;
+                break;
+              }
+            }
+          }
+          $menus = $orderedMenus;
+        }
+      @endphp
+
+      @foreach ($menus as $menu)
         @php
           $isSuperAdmin = auth()->user()->hasRole('super_admin');
           $isClient = auth()->user()->hasRole('client');
+          $isCompany = auth()->user()->hasRole('company');
 
           // HARD WHITELIST FOR CLIENT ROLE
           if ($isClient) {
             $showItem = isset($menu->slug) && str_starts_with($menu->slug, 'client.');
+          }
+          // HARD WHITELIST FOR COMPANY MANAGER ROLE
+          elseif ($isCompany) {
+            $showItem = true; // Already filtered and ordered
           }
           // HARD WHITELIST FOR SUPER ADMIN (if manifest exists)
           elseif ($isSuperAdmin && file_exists(public_path('mix-manifest.json'))) {

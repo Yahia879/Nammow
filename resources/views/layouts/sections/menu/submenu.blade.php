@@ -6,10 +6,16 @@
     @php
       $isSuperAdmin = auth()->user()->hasRole('super_admin');
       $isClient = auth()->user()->hasRole('client');
+      $isCompany = auth()->user()->hasRole('company');
 
       // HARD WHITELIST FOR CLIENT ROLE
       if ($isClient) {
         $showItem = isset($submenu->slug) && str_starts_with($submenu->slug, 'client.');
+      }
+      // HARD WHITELIST FOR COMPANY MANAGER ROLE
+      elseif ($isCompany) {
+        $allowedCompanySlugs = ['structure-employees'];
+        $showItem = isset($submenu->slug) && in_array($submenu->slug, $allowedCompanySlugs);
       }
       // HARD WHITELIST FOR SUPER ADMIN (if manifest exists)
       elseif ($isSuperAdmin && file_exists(public_path('mix-manifest.json'))) {

@@ -41,434 +41,50 @@
   {{-- Alerts --}}
   @include('_partials/_alerts/alert-general')
 
-  {{-- <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
-      </li>
-    </ol>
-  </nav> --}}
+  @if(Auth::user()->hasRole('company'))
+    <div>
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">{{ __('Company') }} /</span> {{ __('Dashboard') }}
+        </h4>
 
-  {{-- @if(Auth::user()->hasRole('Employee|Viewer')) --}}
-  <div class="alert alert-danger alert-dismissible" style="text-align: justify;" role="alert">
-    <h5 class="alert-heading mb-2">{{ __('Reminder!') }}</h5>
-    <p class="mb-0">
-      {{ __('Monitoring and verifying the recorded leave and task is the full responsibility of the employee. If the entries are not verified for accuracy, the employee is solely responsible for any deduction that may be made from the leave balance or salary later.') }}
-    </p>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {{-- @endif --}}
-
-  <div class="row match-height">
-    <div class="col-xl-4 mb-4 col-lg-5 col-12">
-      <div class="card h-100">
-        <div class="card-header">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="card-title mb-0">
-              <h4 class="card-title mb-1">{{ __('Hi,') }} {{ $employee->first_name ?? Auth::user()->name }}! 👋</h4>
-              <small class="text-muted">{{ __('Start your day with a smile') }}</small>
-            </div>
-            @if(Auth::user()->employee_id)
-            <small class="text-muted">{{ __('ID: ') . Auth::user()->employee_id }}</small>
-            @endif
-          </div>
-        </div>
-
-        <div class="d-flex align-items-end row h-100">
-          <div class="col-7">
-            <div class="card-body text-nowrap">
-              {{-- <h5 class="card-title mb-0">{{ __('Hi,') }} {{ Employee::find(Auth::user()->employee_id)->first_name
-                }}! 👋</h5>
-              <p class="mb-2">{{ __('Start your day with a smile') }}</p> --}}
-              {{-- <h5 wire:poll.60s class="text-primary mt-3 mb-2">{{ now()->format('Y/m/d - H:i') }}</h5> --}}
-              <h5 id="date" class="text-primary mt-3 mb-1"></h5>
-              <h5 id="time" class="text-primary mb-2"></h5>
-              @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-              <div class="btn-group dropend">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false"><i class="ti ti-menu-2 ti-xs me-1"></i>{{ __('Add New')
-                  }}</button>
-                <ul class="dropdown-menu">
-                  @if(Auth::user()->canAction('create_employees'))
-                  <li><a class="dropdown-item" href="{{ route('structure-employees') }}"><i
-                        class="ti ti-menu-2 ti-xs me-1"></i> {{ __('Employee') }}</a></li>
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li>
-                  @endif
-                  @if(Auth::user()->canAction('import_fingerprints'))
-                  <li><a class="dropdown-item" href="{{ route('attendance-fingerprints') }}"><i
-                        class="ti ti-menu-2 ti-xs me-1"></i>{{ __('Fingerprint') }}</a></li>
-                  @endif
-                  @if(Auth::user()->canAction('manage_legacy_leaves'))
-                  <li><a wire:click='showCreateLeaveModal' class="dropdown-item" data-bs-toggle="modal"
-                      data-bs-target="#leaveModal" href=""><i class="ti ti-menu-2 ti-xs me-1"></i>{{ __('Leave') }}</a>
-                  </li>
-                  @endif
-                </ul>
-              </div>
-              @endif
-            </div>
-          </div>
-          <div class="col-5 text-center h-100 d-flex align-items-center justify-content-center">
-            <div class="card-body pb-0 px-0 px-md-4 w-100">
-              <i class="ti ti-activity text-primary" style="font-size: 6rem; opacity: 0.2;"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-xl-8 mb-4 col-lg-7 col-12">
-      <div class="card h-100">
-        <div class="card-header">
-          <div class="d-flex justify-content-between mb-3">
-            <h5 class="card-title mb-0">{{ __('Statistics') }}</h5>
-            <small class="text-muted">{{ __('Data as of: ') . ($batchDates[1] ?? __('N/A')) }}</small>
-          </div>
-        </div>
-        @if(Auth::user()->canAction('view_messages'))
-        <div class="card-body">
-          <div class="row gy-3">
-            <div class="col-md-3 col-6">
-              <div class="d-flex align-items-center">
-                <div class="badge rounded-pill bg-label-primary me-3 p-2"><i class="ti ti-activity ti-sm"></i></div>
-                <div class="card-info">
-                  <h5 class="mb-0">{{ $accountBalance['is_active'] }}</h5>
-                  <small>{{ __('API Status') }}</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-6">
-              <div class="d-flex align-items-center">
-                <div class="badge rounded-pill bg-label-primary me-3 p-2"><i class="ti ti-calculator ti-sm"></i></div>
-                <div class="card-info">
-                  <h5 class="mb-0">{{ $accountBalance['balance'] }}</h5>
-                  <small>{{ __('API Balance') }}</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-6">
-              <div class="d-flex align-items-center">
-                <div class="badge rounded-pill bg-label-success me-3 p-2"><i class="ti ti-speakerphone ti-sm"></i></div>
-                <div class="card-info">
-                  <h5 class="mb-0">{{ $messagesStatus['sent'] }}</h5>
-                  <small>{{ __('Successful SMS') }}</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-6">
-              <div class="d-flex align-items-center">
-                <div wire:click='sendPendingMessages' class="badge rounded-pill bg-label-danger me-3 p-2"
-                  style="cursor: pointer"><i class="ti ti-send ti-sm"></i></div>
-                <div class="card-info">
-                  <h5 class="mb-0">{{ $messagesStatus['unsent'] }}</h5>
-                  <small>{{ __('Pending SMS') }}</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        @endif
-        @if(Auth::user()->canAction('view_leaves'))
-        @if($showStatictics)
-          <div class="card-body pt-0">
-            <div class="row gy-3">
-              @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-              <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center">
-                  <div class="badge rounded-pill bg-label-primary me-3 p-2"><i class="ti ti-users ti-sm"></i></div>
-                  <div class="card-info">
-                    <h5 class="mb-0">{{ count($activeEmployees) }}</h5>
-                    <small>{{ __('Active Employees') }}</small>
-                  </div>
-                </div>
-              </div>
-              @endif
-              {{-- <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center">
-                  <div class="badge rounded-pill bg-label-secondary me-3 p-2"><i class="ti ti-calendar ti-sm"></i></div>
-                  <div class="card-info">
-                    <h5 class="mb-0">{{ count($leaveRecords) }}</h5>
-                    <small>{{ __('Today Records') }}</small>
-                  </div>
-                </div>
-              </div> --}}
-              @if($employee)
-              <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center">
-                  <div class="badge rounded-pill bg-label-warning me-3 p-2"><i class="ti ti-zzz ti-sm"></i></div>
-                  <div class="card-info">
-                    <h5 class="mb-0">{{ $employee->max_leave_allowed }}</h5>
-                    <small>{{ __('Leaves Balance') }}</small>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center">
-                  <div class="badge rounded-pill bg-label-warning me-3 p-2"><i class="ti ti-alarm ti-sm"></i></div>
-                  <div class="card-info">
-                    <h5 class="mb-0">{{ $employee->hourly_counter }}</h5>
-                    <small>{{ __('Hourly Counter') }}</small>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center">
-                  <div class="badge rounded-pill bg-label-warning me-3 p-2"><i class="ti ti-hourglass ti-sm"></i></div>
-                  <div class="card-info">
-                    <h5 class="mb-0">{{ $employee->delay_counter }}</h5>
-                    <small>{{ __('Delay Counter') }}</small>
-                  </div>
-                </div>
-              </div>
-              @endif
-            </div>
-          </div>
-        @endif
-        @endif
-      </div>
-    </div>
-
-    {{-- <div class="col-xl-4 col-12">
-      <div class="row">
-        <div class="col-xl-6 mb-4 col-md-3 col-6">
-          <div class="card">
-            <div class="card-header pb-0">
-              <h5 class="card-title mb-0">82.5k</h5>
-              <small class="text-muted">Expenses</small>
-            </div>
-            <div class="card-body">
-              <div id="expensesChart"></div>
-              <div class="mt-md-2 text-center mt-lg-3 mt-3">
-                <small class="text-muted mt-3">$21k Expenses more than last month</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-xl-6 mb-4 col-md-3 col-6">
-          <div class="card">
-            <div class="card-header pb-0">
-              <h5 class="card-title mb-0">Profit</h5>
-              <small class="text-muted">Last Month</small>
-            </div>
-            <div class="card-body">
-              <div id="profitLastMonth"></div>
-              <div class="d-flex justify-content-between align-items-center mt-3 gap-3">
-                <h4 class="mb-0">624k</h4>
-                <small class="text-success">+8.24%</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-xl-12 mb-4 col-md-6">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div class="d-flex flex-column">
-                  <div class="card-title mb-auto">
-                    <h5 class="mb-1 text-nowrap">Generated Leads</h5>
-                    <small>Monthly Report</small>
-                  </div>
-                  <div class="chart-statistics">
-                    <h3 class="card-title mb-1">4,350</h3>
-                    <small class="text-success text-nowrap fw-semibold"><i class='ti ti-chevron-up me-1'></i>
-                      15.8%</small>
-                  </div>
-                </div>
-                <div id="generatedLeadsChart"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> --}}
-
-    {{-- <div class="col-12 col-xl-8 mb-4 col-lg-7">
-      <div class="card">
-        <div class="card-header pb-3 ">
-          <h5 class="m-0 me-2 card-title">Revenue Report</h5>
-        </div>
-        <div class="card-body">
-          <div class="row row-bordered g-0">
-            <div class="col-md-8">
-              <div id="totalRevenueChart"></div>
-            </div>
-            <div class="col-md-4">
-              <div class="text-center mt-4">
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="budgetId"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <script>
-                      document.write(new Date().getFullYear())
-
-                    </script>
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-end" aria-labelledby="budgetId">
-                    <a class="dropdown-item prev-year1" href="javascript:void(0);">
-                      <script>
-                        document.write(new Date().getFullYear() - 1)
-
-                      </script>
-                    </a>
-                    <a class="dropdown-item prev-year2" href="javascript:void(0);">
-                      <script>
-                        document.write(new Date().getFullYear() - 2)
-
-                      </script>
-                    </a>
-                    <a class="dropdown-item prev-year3" href="javascript:void(0);">
-                      <script>
-                        document.write(new Date().getFullYear() - 3)
-
-                      </script>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <h3 class="text-center pt-4 mb-0">$25,825</h3>
-              <p class="mb-4 text-center"><span class="fw-semibold">Budget: </span>56,800</p>
-              <div class="px-3">
-                <div id="budgetChart"></div>
-              </div>
-              <div class="text-center mt-4">
-                <button type="button" class="btn btn-primary">Increase Button</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> --}}
-  </div>
-
-  <div class="row">
-    <div class="col">
-      <div class="card">
-        <h5 class="card-header">{{ __('Recently Leaves')}}</h5>
-        <div class="table-responsive text-nowrap">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th class="col-1">{{ __('ID') }}</th>
-                @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-                <th>{{ __('Employee') }}</th>
-                @endif
-                <th class="col-1">{{ __('Type') }}</th>
-                <th style="text-align: center">{{ __('Details') }}</th>
-                @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-                <th style="text-align: center">{{ __('Actions') }}</th>
-                @endif
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              @forelse($leaveRecords as $leave)
-              <tr>
-                <td><strong>{{ $leave->id }}</strong></td>
-                @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-                <td class="td">{{ $this->getEmployeeName($leave->employee_id) }}</td>
-                @endif
-                <td>{{ $this->getLeaveType($leave->leave_id) }}</td>
-                <td style="text-align: center">
-                  <span class="badge bg-label-primary mb-2 me-1" style="font-size: 14px">{{ $leave->from_date . ' --> '
-                    . $leave->to_date }}</span>
-                  <br>
-                  @if ($leave->start_at !== null)
-                  <span class="badge bg-label-secondary me-1">{{ Carbon::parse($leave->start_at)->format('H:i') . ' -->
-                    ' . Carbon::parse($leave->end_at)->format('H:i') }}</span>
-                  @endif
-                </td>
-                @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-                <td style="text-align: center">
-                  <button type="button"
-                    class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-secondary waves-effect">
-                    <span wire:click.prevent="showEditLeaveModal({{ $leave->id }})" data-bs-toggle="modal"
-                      data-bs-target="#leaveModal" class="ti ti-pencil"></span>
-                  </button>
-                  <button type="button" class="btn btn-sm btn-tr rounded-pill btn-icon btn-outline-danger waves-effect">
-                    <span wire:click.prevent="confirmDestroyLeave({{ $leave->id }})" class="ti ti-trash"></span>
-                  </button>
-                  @if ($confirmedId === $leave->id)
-                  <button wire:click.prevent="destroyLeave" type="button"
-                    class="btn btn-xs btn-danger waves-effect waves-light">
-                    {{ __('Sure?') }}
-                  </button>
-                  @endif
-                </td>
-                @endif
-              </tr>
-              @empty
-              <tr>
-                <td colspan="6">
-                  <div class="mt-2 mb-2" style="text-align: center">
-                    <h3 class="mb-1 mx-2">{{ __('Excellent!') .  '🎉' }}</h3>
-                    <p class="mb-4 mx-2">
-                      {{ __('No leaves found, keep up the good work.') }}
-                    </p>
-                    @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-                    <button class="btn btn-label-primary mb-4" data-bs-toggle="modal" data-bs-target="#leaveModal">
-                      {{ __('Add New Leave') }}
-                    </button>
-                    @endif
-                    <div class="text-light mt-3">
-                      <i class="ti ti-clipboard-off" style="font-size: 6rem; opacity: 0.2;"></i>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        {{ __('Welcome to the Company Dashboard. Manage your employees here.') }}
                     </div>
-                  </div>
-                </td>
-              </tr>
-              @endforelse
-            </tbody>
-          </table>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+  @else
+    {{-- ORIGINAL DASHBOARD CONTENT (FROZEN) --}}
+    {{--
+    <div class="alert alert-danger alert-dismissible" style="text-align: justify;" role="alert">
+      <h5 class="alert-heading mb-2">{{ __('Reminder!') }}</h5>
+...
+    @push('custom-scripts')
+    <script>
+      function updateClock() {
+              const now = new Date();
+              const dateOptions = {
+                  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+              };
+              const timeOptions = {
+                  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+              };
 
-  {{-- Discount dev Here --}}
+              const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+              const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
 
-  @if(Auth::user()->canAction('view_dashboard_company') || Auth::user()->canAction('view_dashboard_super_admin') || Auth::user()->canAction('view_dashboard_client'))
-    <div class="row mt-4">
-      <div class="col">
-        <div class="card">
-          <h5 class="card-header">{{ __('Changelog') }}</h5>
-          <div class="card-body">
-            @foreach ($changelogs as $changelog)
-            <small all class="text-light fw-semibold">{{ $changelog->version }}</small>
-            <dl class="row mt-2">
-              <dt class="col-sm-3">{{ $changelog->title }}</dt>
-              <dd class="col-sm-9">{{ $changelog->description }}</dd>
-            </dl>
-            @endforeach
-          </div>
-        </div>
-      </div>
-    </div>
+              document.getElementById('date').innerHTML = formattedDate;
+              document.getElementById('time').innerHTML = formattedTime;
+          }
+
+          setInterval(updateClock, 1000); // Update every second
+          updateClock(); // Initial call to display clock immediately
+    </script>
+    @endpush
+    --}}
   @endif
-
-  {{-- Modals --}}
-  @include('_partials/_modals/modal-leaveWithEmployee')
-
-  @push('custom-scripts')
-  <script>
-    function updateClock() {
-            const now = new Date();
-            const dateOptions = {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            };
-            const timeOptions = {
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-            };
-
-            const formattedDate = now.toLocaleDateString('en-US', dateOptions);
-            const formattedTime = now.toLocaleTimeString('en-US', timeOptions);
-
-            document.getElementById('date').innerHTML = formattedDate;
-            document.getElementById('time').innerHTML = formattedTime;
-        }
-
-        setInterval(updateClock, 1000); // Update every second
-        updateClock(); // Initial call to display clock immediately
-  </script>
-  @endpush
 </div>
