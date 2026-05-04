@@ -15,7 +15,7 @@ class Discount extends Model
 {
     use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
-    protected $fillable = ['company_id', 'employee_id', 'rate', 'date', 'reason', 'is_auto', 'is_sent', 'batch'];
+    protected $fillable = ['company_id', 'employee_id', 'rate', 'amount', 'date', 'reason', 'is_auto', 'is_sent', 'batch'];
 
     // 👉 Links
     public function employee(): BelongsTo

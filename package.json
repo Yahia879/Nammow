@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run development",
+    "serve": "php artisan serve",
     "build": "npm run build",
     "development": "mix",
     "watch": "mix watch",

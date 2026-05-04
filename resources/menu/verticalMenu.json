@@ -5,19 +5,19 @@
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
       "slug": "super-admin.dashboard",
-      "role": ["super_admin"]
+      "action": "view_dashboard_super_admin"
     },
     {
       "name": "super_admin.client_management",
       "icon": "menu-icon tf-icons ti ti-users",
-      "slug": "super-admin.",
-      "role": ["super_admin"],
+      "slug": "super-admin-clients",
+      "action": "view_clients",
       "submenu": [
         {
           "url": "/super-admin/clients",
           "name": "super_admin.clients",
           "slug": "super-admin-clients",
-          "role": ["super_admin"]
+          "action": "view_clients"
         }
       ]
     },
@@ -26,63 +26,192 @@
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
       "slug": "client.dashboard",
-      "role": ["client"]
+      "action": "view_dashboard_client"
     },
     {
       "name": "client.company_management",
       "icon": "menu-icon tf-icons ti ti-building",
-      "slug": "client.",
-      "role": ["client"],
+      "slug": "client.companies",
+      "action": "view_companies",
       "submenu": [
         {
           "url": "/client/companies",
           "name": "client.companies",
           "slug": "client.companies",
-          "role": ["client"]
+          "action": "view_companies"
         },
         {
           "url": "/client/company-managers",
           "name": "Company Managers",
           "slug": "client.company-managers",
-          "role": ["client"]
+          "action": "view_company_managers"
         }
       ]
+    },
+    {
+      "url": "/client/leaves",
+      "name": "Leaves Requests",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "client-leaves",
+      "action": "manage_leave_requests"
+    },
+    {
+      "url": "/client/holidays",
+      "name": "Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "client-holidays",
+      "action": "view_holidays"
+    },
+    {
+      "url": "/client/advances",
+      "name": "Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "client-advances",
+      "action": "view_client_advances"
+    },
+    {
+      "url": "/client/salaries",
+      "name": "Salaries",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "client-salaries",
+      "action": "view_employee_salary"
     },
     {
       "url": "/company/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
       "slug": "company-dashboard",
-      "role": ["company"]
+      "action": "view_dashboard_company"
+    },
+    {
+      "url": "/company/leaves",
+      "name": "Leaves Requests",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "company-leaves",
+      "action": "manage_leave_requests"
+    },
+    {
+      "url": "/company/holidays",
+      "name": "Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "company-holidays",
+      "action": "view_holidays"
+    },
+    {
+      "name": "Loans & Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "company-advances",
+      "action": "view_company_advances",
+      "submenu": [
+        {
+          "url": "/company/advances",
+          "name": "Management",
+          "slug": "company-advances-management",
+          "action": "view_company_advances"
+        },
+        {
+          "url": "/company/advances/settings",
+          "name": "Settings",
+          "slug": "company-advances-settings",
+          "action": "manage_advance_settings"
+        }
+      ]
+    },
+    {
+      "url": "/company/salaries",
+      "name": "Salaries",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "company-salaries",
+      "action": "view_employee_salary"
     },
     {
       "url": "/employee/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons ti ti-dashboard",
       "slug": "employee-dashboard",
-      "role": ["employee"]
+      "action": "view_dashboard_employee"
+    },
+    {
+      "url": "/employee/leaves",
+      "name": "My Leaves",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "employee-leaves",
+      "action": "view_my_leaves"
+    },
+    {
+      "url": "/employee/holidays",
+      "name": "Company Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "employee-holidays",
+      "action": "view_my_holidays"
+    },
+    {
+      "url": "/employee/advances",
+      "name": "My Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "employee-advances",
+      "action": "view_my_advances"
+    },
+    {
+      "url": "/employee/salary",
+      "name": "My Salary",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "employee-salary",
+      "action": "view_my_salary"
+    },
+    {
+      "menuHeader": "Management",
+      "action": "view_clients"
+    },
+    {
+      "url": "/super-admin/leaves",
+      "name": "Leaves Requests",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "super-admin-leaves",
+      "action": "manage_leave_requests"
+    },
+    {
+      "url": "/super-admin/holidays",
+      "name": "Holidays",
+      "icon": "menu-icon tf-icons ti ti-christmas-tree",
+      "slug": "super-admin-holidays",
+      "action": "view_holidays"
+    },
+    {
+      "url": "/super-admin/advances",
+      "name": "Advances",
+      "icon": "menu-icon tf-icons ti ti-cash",
+      "slug": "super-admin-advances",
+      "action": "manage_advances"
+    },
+    {
+      "url": "/super-admin/salaries",
+      "name": "Salaries",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "super-admin-salaries",
+      "action": "view_employee_salary"
     },
     {
       "menuHeader": "Human resource",
-      "role": ["company"]
+      "action": "view_employees"
     },
     {
       "name": "Attendance",
       "icon": "menu-icon tf-icons ti ti-door-exit",
       "slug": "attendance",
-      "role": ["-company"],
+      "action": "view_attendance",
       "submenu": [
         {
           "url": "attendance/fingerprints",
           "name": "Fingerprints",
           "slug": "attendance-fingerprints",
-          "role": ["-company"]
+          "action": "view_fingerprints"
         },
         {
           "url": "attendance/leaves",
-          "name": "Leaves",
+          "name": "Legacy Leaves",
           "slug": "attendance-leaves",
-          "role": ["-company"]
+          "action": "manage_legacy_leaves"
         }
       ]
     },
@@ -90,31 +219,31 @@
       "name": "Structure",
       "icon": "menu-icon tf-icons ti ti-hierarchy",
       "slug": "structure",
-      "role": ["company"],
+      "action": "view_structure",
       "submenu": [
         {
           "url": "structure/centers",
           "name": "Centers",
           "slug": "structure-centers",
-          "role": ["-company"]
+          "action": "view_structure"
         },
         {
           "url": "structure/departments",
           "name": "Departments",
           "slug": "structure-departments",
-          "role": ["-company"]
+          "action": "view_structure"
         },
         {
           "url": "structure/positions",
           "name": "Positions",
           "slug": "structure-positions",
-          "role": ["-company"]
+          "action": "view_structure"
         },
         {
           "url": "structure/employees",
           "name": "Employees",
           "slug": "structure-employees",
-          "role": ["company"]
+          "action": "view_employees"
         }
       ]
     },
@@ -122,19 +251,19 @@
       "name": "Messages",
       "icon": "menu-icon tf-icons ti ti-message-dots",
       "slug": "messages",
-      "role": ["-company"],
+      "action": "view_messages",
       "submenu": [
         {
           "url": "messages/bulk",
           "name": "Bulk",
           "slug": "messages-bulk",
-          "role": ["-company"]
+          "action": "view_messages"
         },
         {
           "url": "messages/personal",
           "name": "Personal",
           "slug": "messages-personal",
-          "role": ["-company"]
+          "action": "view_messages"
         }
       ]
     },
@@ -143,79 +272,72 @@
       "name": "Discounts",
       "icon": "menu-icon tf-icons ti ti-coin",
       "slug": "discounts",
-      "role": ["-company"]
-    },
-    {
-      "url": "/holidays",
-      "name": "Holidays",
-      "icon": "menu-icon tf-icons ti ti-christmas-tree",
-      "slug": "holidays",
-      "role": ["-company"]
+      "action": "view_discounts"
     },
     {
       "url": "/statistics",
       "name": "Statistics",
       "icon": "menu-icon tf-icons ti ti-device-desktop-analytics",
       "slug": "statistics",
-      "role": ["-company"]
+      "action": "view_statistics"
     },
     {
       "name": "Settings",
       "icon": "menu-icon tf-icons ti ti-adjustments-alt",
       "slug": "settings",
-      "role": [],
+      "action": "manage_settings",
       "submenu": [
         {
           "url": "settings/users",
           "name": "Users",
           "slug": "settings-users",
-          "role": []
+          "action": "manage_settings"
         },
         {
           "url": "settings/roles",
           "name": "Roles",
           "slug": "settings-roles",
-          "role": []
+          "action": "manage_settings"
         },
         {
           "url": "settings/permissions",
           "name": "Permissions",
           "slug": "settings-permissions",
-          "role": []
+          "action": "manage_settings"
         },
         {
           "url": "log-viewer",
           "name": "Logs",
           "slug": "settings-logs",
           "target": "_blank",
-          "role": []
+          "action": "manage_settings"
         }
       ]
     },
     {
       "menuHeader": "Assets",
-      "role": ["-company"]
+      "action": "view_assets"
     },
     {
       "url": "/assets/inventory",
       "name": "Inventory",
       "icon": "menu-icon tf-icons ti ti-barcode",
       "slug": "products",
-      "role": ["-company"]
+      "action": "view_assets"
     },
     {
       "url": "/assets/categories",
       "name": "Categories",
       "icon": "menu-icon tf-icons ti ti-category",
       "slug": "categories",
-      "role": ["-company"]
+      "action": "view_asset_categories"
     },
     {
       "url": "/assets/reports",
       "name": "Reports",
       "icon": "menu-icon tf-icons ti ti-file-analytics",
       "slug": "reports",
-      "role": ["-company"]
+      "action": "view_asset_reports"
     }
   ]
 }

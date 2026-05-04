@@ -26,11 +26,10 @@ class EmployeeUserSeeder extends Seeder
                 'profile_photo_path' => 'profile-photos/'.$employee->id.'.jpg',
             ]);
 
-            DB::table('model_has_roles')->insert([
-                'role_id' => 7,
-                'model_type' => User::class,
-                'model_id' => $user->id,
-            ]);
+            $employeeRole = \App\Models\Role::where('name', 'employee')->first();
+            if ($employeeRole) {
+                $user->update(['role_id' => $employeeRole->id]);
+            }
         }
 
         $this->command->info("User accounts have been successfully created for {$employees->count()} active employees.");

@@ -251,58 +251,67 @@
                                 <div class="tab-pane fade" :class="{ 'show active': activeTab === 'managers' }" id="navs-managers" role="tabpanel">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h5 class="mb-0">{{ __('Managers List') }}</h5>
-                                        <button wire:click="addManager" type="button" class="btn btn-sm btn-outline-primary">
+                                        <button wire:click="addManager" type="button" class="btn btn-sm btn-primary">
                                             <i class="ti ti-plus me-1"></i> {{ __('Add Manager') }}
                                         </button>
                                     </div>
 
-                                    @foreach($managers as $index => $manager)
-                                    <div class="card border mb-3">
-                                        <div class="card-body p-3">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="mb-0">{{ __('Manager') }} #{{ $index + 1 }} @if(isset($manager['is_existing']) && $manager['is_existing']) <span class="badge bg-label-info ms-2">{{ __('Existing') }}</span> @endif</h6>
-                                                @if((!isset($manager['is_existing']) || !$manager['is_existing']) && count($managers) > 1)
-                                                <button wire:click="removeManager({{ $index }})" type="button" class="btn btn-sm btn-label-danger btn-icon">
-                                                    <i class="ti ti-x"></i>
-                                                </button>
-                                                @endif
-                                            </div>
-                                            <div class="row g-3">
-                                                <div class="col-12">
-                                                    <label class="form-label">{{ __('Manager Name') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.name" type="text" class="form-control @error('managers.' . $index . '.name') is-invalid @enderror" placeholder="{{ __('Manager Name') }}" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
-                                                    @error('managers.' . $index . '.name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">{{ __('Manager Email') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.email" type="email" class="form-control @error('managers.' . $index . '.email') is-invalid @enderror" placeholder="manager@company.com" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
-                                                    @error('managers.' . $index . '.email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">{{ __('Manager Phone') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.phone" type="text" class="form-control @error('managers.' . $index . '.phone') is-invalid @enderror" placeholder="+966 5X XXX XXXX" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
-                                                    @error('managers.' . $index . '.phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                                </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>{{ __('Name') }}</th>
+                                                    <th>{{ __('Email') }}</th>
+                                                    <th>{{ __('Status') }}</th>
+                                                    <th>{{ __('Action') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($managers as $index => $manager)
+                                                <tr>
+                                                    <td class="p-2">
+                                                        <input wire:model="managers.{{ $index }}.name" type="text" class="form-control form-control-sm @error('managers.' . $index . '.name') is-invalid @enderror" placeholder="{{ __('Name') }}" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
+                                                    </td>
+                                                    <td class="p-2">
+                                                        <input wire:model="managers.{{ $index }}.email" type="email" class="form-control form-control-sm @error('managers.' . $index . '.email') is-invalid @enderror" placeholder="email@company.com" {{ (isset($manager['is_existing']) && $manager['is_existing']) ? 'readonly' : '' }}>
+                                                    </td>
+                                                    <td class="p-2 text-center">
+                                                        @if(isset($manager['is_existing']) && $manager['is_existing'])
+                                                            <span class="badge bg-label-{{ $manager['status'] === 'active' ? 'success' : 'secondary' }} mt-1">
+                                                                {{ __(ucfirst($manager['status'])) }}
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-label-primary mt-1">{{ __('New') }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="p-2 text-center">
+                                                        @if(!isset($manager['is_existing']) || !$manager['is_existing'])
+                                                        <button wire:click="removeManager({{ $index }})" type="button" class="btn btn-sm btn-icon btn-label-danger">
+                                                            <i class="ti ti-trash"></i>
+                                                        </button>
+                                                        @else
+                                                        <i class="ti ti-lock text-muted"></i>
+                                                        @endif
+                                                    </td>
+                                                </tr>
                                                 @if(!isset($manager['is_existing']) || !$manager['is_existing'])
-                                                <div class="col-md-6">
-                                                    <label class="form-label">{{ __('Password') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.password" type="password" class="form-control @error('managers.' . $index . '.password') is-invalid @enderror" placeholder="············">
-                                                    @error('managers.' . $index . '.password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">{{ __('Confirm Password') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.password_confirmation" type="password" class="form-control" placeholder="············">
-                                                </div>
-                                                @else
-                                                <div class="col-md-6">
-                                                    <label class="form-label">{{ __('Status') }}</label>
-                                                    <input wire:model="managers.{{ $index }}.status" type="text" class="form-control" readonly>
-                                                </div>
+                                                <tr>
+                                                    <td colspan="4" class="bg-light p-2">
+                                                        <div class="row g-2">
+                                                            <div class="col-md-6">
+                                                                <input wire:model="managers.{{ $index }}.password" type="password" class="form-control form-control-sm @error('managers.' . $index . '.password') is-invalid @enderror" placeholder="{{ __('Password') }}">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <input wire:model="managers.{{ $index }}.password_confirmation" type="password" class="form-control form-control-sm" placeholder="{{ __('Confirm Password') }}">
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                                 @endif
-                                            </div>
-                                        </div>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    @endforeach
                                 </div>
                                 @endif
                             </div>

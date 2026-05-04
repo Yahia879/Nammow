@@ -12,12 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->string('owner_name')->nullable()->after('name');
-            $table->string('cr_number')->nullable()->after('owner_name');
-            $table->string('unified_number')->nullable()->after('cr_number');
-            $table->date('attestation_date')->nullable()->after('unified_number');
-            $table->date('attestation_expiry_date')->nullable()->after('attestation_date');
-            $table->string('cr_image')->nullable()->after('attestation_expiry_date');
+            if (!Schema::hasColumn('companies', 'owner_name')) {
+                $table->string('owner_name')->nullable()->after('name');
+            }
+            if (!Schema::hasColumn('companies', 'cr_number')) {
+                $table->string('cr_number')->nullable()->after('owner_name');
+            }
+            if (!Schema::hasColumn('companies', 'unified_number')) {
+                $table->string('unified_number')->nullable()->after('cr_number');
+            }
+            if (!Schema::hasColumn('companies', 'attestation_date')) {
+                $table->date('attestation_date')->nullable()->after('unified_number');
+            }
+            if (!Schema::hasColumn('companies', 'attestation_expiry_date')) {
+                $table->date('attestation_expiry_date')->nullable()->after('attestation_date');
+            }
+            if (!Schema::hasColumn('companies', 'cr_image')) {
+                $table->string('cr_image')->nullable()->after('attestation_expiry_date');
+            }
         });
     }
 

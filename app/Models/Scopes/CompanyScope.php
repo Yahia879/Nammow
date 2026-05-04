@@ -16,7 +16,7 @@ class CompanyScope implements Scope
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $role = $user->getRoleNames()->first();
+            $role = $user->role->name ?? null;
 
             if ($role === 'company') {
                 $companyIds = $user->companyManager ? $user->companyManager->companies->pluck('id')->toArray() : [$user->company_id];

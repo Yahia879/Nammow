@@ -44,6 +44,11 @@ class Helpers
     // if any key missing of array from custom.php file it will be merge and set a default value from dataDefault array and store in data variable
     $data = array_merge($DefaultData, $data);
 
+    // Auto-detect RTL based on locale
+    if (app()->getLocale() === 'ar') {
+      $data['myRTLMode'] = true;
+    }
+
     // All options available in the template
     $allOptions = [
       'myLayout' => ['vertical', 'horizontal', 'blank'],

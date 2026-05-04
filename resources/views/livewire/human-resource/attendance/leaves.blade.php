@@ -10,25 +10,17 @@
   @section('vendor-style')
     <link rel="stylesheet" href="{{asset('assets/vendor/libs/flatpickr/flatpickr.css')}}"/>
     <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
+  @endsection
+
+  @section('vendor-script')
+    <script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
   @endsection
 
   @section('page-style')
     <link rel="stylesheet" href="{{asset('assets/vendor/css/pages/app-calendar.css')}}"/>
 
     <style>
-      tr.disabled {
-        opacity: 0.5;
-        pointer-events: none;
-        text-decoration: line-through;
-      }
-      tr.disabled i {
-          display: none;
-      }
-    </style>
-  @endsection
-
-  {{-- Alerts --}}
-  @include('_partials/_alerts/alert-general')
 
   <div class="card app-calendar-wrapper">
     <div class="row g-0">
@@ -121,11 +113,11 @@
                       <h6 class="dropdown-header text-uppercase">{{ __('Import & Export') }}</h6>
                     </li>
                     <li>
-                      @can('Import leaves')
+                      @if(Auth::user()->canAction('manage_legacy_leaves'))
                       <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#importModal">
                         <i class="ti ti-table-import me-1"></i> {{ __('Import From Excel') }}
                       </button>
-                      @endcan
+                      @endif
                     </li>
                     <li>
                       <button wire:click='exportToExcel()' class="dropdown-item">
@@ -154,8 +146,8 @@
                     <tr class="@if ($leave->pivot->is_checked) disabled @endif">
                       <td>{{ $leave->pivot->id }}</td>
                       <td>{{ $leave->name }}</td>
-                      <td>{{ $leave->pivot->from_date }}</td>
-                      <td>{{ $leave->pivot->to_date }}</td>
+                      <td>{{ $leave->pivot->from_date->format('Y-m-d') }}</td>
+                      <td>{{ $leave->pivot->to_date->format('Y-m-d') }}</td>
                       <td>{{ $leave->pivot->start_at ? Carbon::parse($leave->pivot->start_at)->format('H:i') : '-' }}</td>
                       <td>{{ $leave->pivot->end_at ? Carbon::parse($leave->pivot->end_at)->format('H:i') : '-' }}</td>
                       <td
@@ -163,13 +155,9 @@
                         <div>
                           <a wire:click.prevent="showUpdateLeaveModal({{ $leave->pivot->id }})"  data-bs-toggle="modal" data-bs-target="#leaveModal" href=""><i
                               class="ti ti-edit text-info"></i></a>
-                          <a wire:click.prevent="confirmDestroyLeave({{ $leave->pivot->id }})" href=""><i
-                              class="ti ti-trash text-danger"></i></a>
-                          @if ($confirmedId === $leave->pivot->id)
-                            <button wire:click.prevent='destroyLeave({{ $leave }})' type="button"
-                                    class="btn btn-xs btn-danger waves-effect waves-light">{{ __('Sure?') }}
-                            </button>
-                          @endif
+                          <a href="javascript:void(0);" onclick="confirmDelete({{ $leave->pivot->id }})">
+                            <i class="ti ti-trash text-danger"></i>
+                          </a>
                         </div>
                       </td>
                     </tr>
@@ -256,11 +244,34 @@
     </script>
 
     <script>
+      function confirmDelete(id) {
+        Swal.fire({
+          title: "{{ __('Are you sure?') }}",
+          text: "{{ __('You won\'t be able to revert this!') }}",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: "{{ __('Yes, delete it!') }}",
+          cancelButtonText: "{{ __('Cancel') }}",
+          customClass: {
+            confirmButton: 'btn btn-danger me-1',
+            cancelButton: 'btn btn-label-secondary'
+          },
+          buttonsStyling: false
+        }).then((result) => {
+          if (result.isConfirmed) {
+            @this.call('destroyLeave', id);
+          }
+        });
+      }
+    </script>
+
+    <script>
       $(document).ready(function () {
         const flatpickrRange = document.querySelector('#flatpickr-range');
         if (typeof flatpickrRange != undefined) {
           flatpickrRange.flatpickr({
-            mode: 'range'
+            mode: 'range',
+            dateFormat: 'Y-m-d'
           });
         }
       });

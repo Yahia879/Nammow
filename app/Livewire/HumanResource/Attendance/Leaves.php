@@ -56,6 +56,8 @@ class Leaves extends Component
 
     public $isEdit = false;
 
+    public $isChecked = false;
+
     public $leaveTypes;
 
     public $selectedLeave;
@@ -98,15 +100,21 @@ class Leaves extends Component
 
         $currentDate = Carbon::now();
         $previousMonth = $currentDate->copy()->subMonth();
-        $this->dateRange = $previousMonth->format('Y-n-1').' to '.$currentDate;
+        $this->dateRange = $previousMonth->format('Y-m-d').' to '.$currentDate->format('Y-m-d');
     }
 
     public function render()
     {
         $leaves = $this->applyFilter();
 
+        $minDate = Carbon::tomorrow()->toDateString();
+        $maxDate = Carbon::now()->endOfMonth()->toDateString();
+
         return view('livewire.human-resource.attendance.leaves', [
             'leaves' => $leaves,
+            'minDate' => $minDate,
+            'maxDate' => $maxDate,
+            'isChecked' => $this->isChecked,
         ]);
     }
 
@@ -152,13 +160,32 @@ class Leaves extends Component
 
     public function submitLeave()
     {
+        $minDate = Carbon::tomorrow()->toDateString();
+        $maxDate = Carbon::now()->endOfMonth()->toDateString();
+
+        $rules = [
+            'selectedEmployeeId' => 'required',
+            'newLeaveInfo.LeaveId' => 'required',
+            'newLeaveInfo.fromDate' => 'required|date',
+            'newLeaveInfo.toDate' => 'required|date',
+        ];
+
+        // Apply range validation only if not editing an already checked record
+        $shouldValidateRange = true;
+        if ($this->isEdit) {
+            $record = DB::table('employee_leave')->where('id', $this->employeeLeaveId)->first();
+            if ($record && $record->is_checked) {
+                $shouldValidateRange = false;
+            }
+        }
+
+        if ($shouldValidateRange) {
+            $rules['newLeaveInfo.fromDate'] .= "|after_or_equal:$minDate|before_or_equal:$maxDate";
+            $rules['newLeaveInfo.toDate'] .= "|after_or_equal:newLeaveInfo.fromDate|before_or_equal:$maxDate";
+        }
+
         $this->validate(
-            [
-                'selectedEmployeeId' => 'required',
-                'newLeaveInfo.LeaveId' => 'required',
-                'newLeaveInfo.fromDate' => 'required|date',
-                'newLeaveInfo.toDate' => 'required|date',
-            ],
+            $rules,
             null,
             [
                 'selectedEmployeeId' => 'Employee',
@@ -172,49 +199,39 @@ class Leaves extends Component
             substr($this->newLeaveInfo['LeaveId'], 1, 1) == 1 &&
             ($this->newLeaveInfo['startAt'] != null || $this->newLeaveInfo['endAt'] != null)
         ) {
-            session()->flash('error', __('Can\'t add daily leave with time!'));
+            $this->dispatch('toastr', type: 'error', message: __('Can\'t add daily leave with time!'));
             $this->dispatch('closeModal', elementId: '#leaveModal');
-            $this->dispatch('toastr', type: 'error' /* , title: 'Done!' */, message: __('Requires Attention!'));
-
             return;
         }
 
         if (
-            substr($this->newLeaveInfo['LeaveId'], 1, 1) == 2 &&
-            ($this->newLeaveInfo['startAt'] == null || $this->newLeaveInfo['endAt'] == null)
+            substr($this->new_leave_info['LeaveId'], 1, 1) == 2 &&
+            ($this->new_leave_info['startAt'] == null || $this->new_leave_info['endAt'] == null)
         ) {
-            session()->flash('error', __('Can\'t add hourly leave without time!'));
+            $this->dispatch('toastr', type: 'error', message: __('Can\'t add hourly leave without time!'));
             $this->dispatch('closeModal', elementId: '#leaveModal');
-            $this->dispatch('toastr', type: 'error' /* , title: 'Done!' */, message: __('Requires Attention!'));
-
             return;
         }
 
         if (
-            substr($this->newLeaveInfo['LeaveId'], 1, 1) == 2 &&
-            $this->newLeaveInfo['fromDate'] != $this->newLeaveInfo['toDate'] &&
-            $this->newLeaveInfo['LeaveId'] != '1210'
+            substr($this->new_leave_info['LeaveId'], 1, 1) == 2 &&
+            $this->new_leave_info['fromDate'] != $this->new_leave_info['toDate'] &&
+            $this->new_leave_info['LeaveId'] != '1210'
         ) {
-            session()->flash('error', __('Hourly leave must be on the same day!'));
+            $this->dispatch('toastr', type: 'error', message: __('Hourly leave must be on the same day!'));
             $this->dispatch('closeModal', elementId: '#leaveModal');
-            $this->dispatch('toastr', type: 'error' /* , title: 'Done!' */, message: __('Requires Attention!'));
-
             return;
         }
 
-        if ($this->newLeaveInfo['fromDate'] > $this->newLeaveInfo['toDate']) {
-            session()->flash('error', __('Check the dates entered. "From Date" cannot be greater than "To Date"'));
+        if ($this->new_leave_info['fromDate'] > $this->new_leave_info['toDate']) {
+            $this->dispatch('toastr', type: 'error', message: __('Check the dates entered. "From Date" cannot be greater than "To Date"'));
             $this->dispatch('closeModal', elementId: '#leaveModal');
-            $this->dispatch('toastr', type: 'error' /* , title: 'Done!' */, message: __('Requires Attention!'));
-
             return;
         }
 
-        if ($this->newLeaveInfo['startAt'] > $this->newLeaveInfo['endAt']) {
-            session()->flash('error', __('Check the times entered. "Start At" cannot be greater than "End To"'));
+        if ($this->new_leave_info['startAt'] > $this->new_leave_info['endAt']) {
+            $this->dispatch('toastr', type: 'error', message: __('Check the times entered. "Start At" cannot be greater than "End To"'));
             $this->dispatch('closeModal', elementId: '#leaveModal');
-            $this->dispatch('toastr', type: 'error' /* , title: 'Done!' */, message: __('Requires Attention!'));
-
             return;
         }
 
@@ -224,7 +241,7 @@ class Leaves extends Component
     public function showCreateLeaveModal()
     {
         $this->dispatch('clearSelect2Values');
-        $this->reset('isEdit', 'newLeaveInfo');
+        $this->reset('isEdit', 'isChecked', 'newLeaveInfo');
     }
 
     public function createLeave()
@@ -239,11 +256,10 @@ class Leaves extends Component
             'note' => $this->newLeaveInfo['note'],
         ]);
 
-        session()->flash('success', __('Success, record created successfully!'));
         $this->dispatch('scrollToTop');
 
         $this->dispatch('closeModal', elementId: '#leaveModal');
-        $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        $this->dispatch('toastr', type: 'success', message: __('Success, record created successfully!'));
     }
 
     public function showUpdateLeaveModal($id)
@@ -257,6 +273,7 @@ class Leaves extends Component
             ->where('id', $this->employeeLeaveId)
             ->first();
 
+        $this->isChecked = $record->is_checked ? true : false;
         $this->selectedEmployeeId = $record->employee_id;
         $this->newLeaveInfo = [
             'LeaveId' => $record->leave_id,
@@ -282,11 +299,10 @@ class Leaves extends Component
             'note' => $this->newLeaveInfo['note'],
         ]);
 
-        session()->flash('success', __('Success, record updated successfully!'));
         $this->dispatch('scrollToTop');
 
         $this->dispatch('closeModal', elementId: '#leaveModal');
-        $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        $this->dispatch('toastr', type: 'success', message: __('Success, record updated successfully!'));
 
         $this->reset('isEdit', 'newLeaveInfo');
     }
@@ -296,13 +312,13 @@ class Leaves extends Component
         $this->confirmedId = $id;
     }
 
-    public function destroyLeave()
+    public function destroyLeave($id)
     {
         $this->selectedEmployee
             ->leaves()
-            ->wherePivot('id', $this->confirmedId)
+            ->wherePivot('id', $id)
             ->detach();
-        $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
+        $this->dispatch('toastr', type: 'success', message: __('Success, record deleted successfully!'));
     }
 
     public function importFromExcel()

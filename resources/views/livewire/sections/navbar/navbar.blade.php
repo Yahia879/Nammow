@@ -252,7 +252,7 @@
                             !!No Name!!
                           @endif
                         </span>
-                        <small class="text-muted">{{ Auth::user()->getRoleNames()->first() }}</small>
+                        <small class="text-muted">{{ is_array($trans = __(Auth::user()?->role?->name ?? '')) ? (Auth::user()?->role?->name ?? '') : $trans }}</small>
                       </div>
                     </div>
                   </a>

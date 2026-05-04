@@ -2,35 +2,48 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToCompany;
 use App\Traits\CreatedUpdatedDeletedBy;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Holiday extends Model
 {
-    use BelongsToCompany, CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
+    use CreatedUpdatedDeletedBy, HasFactory, SoftDeletes;
 
-    protected $fillable = ['company_id', 'name', 'from_date', 'to_date', 'note'];
+    protected $fillable = [
+        'client_id',
+        'company_manager_id',
+        'created_by_type',
+        'title',
+        'description',
+        'start_date',
+        'end_date',
+        'scope',
+    ];
 
-    // 👉 Links
-    public function centers(): BelongsToMany
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
+    public function client()
     {
-        return $this->belongsToMany(Center::class)->withPivot(
-            'created_by',
-            'updated_by',
-            'deleted_by',
-            'created_at',
-            'updated_at',
-            'deleted_at'
-        );
+        return $this->belongsTo(Client::class);
     }
 
-    protected function name(): Attribute
+    public function companyManager()
     {
-        return Attribute::make(set: fn (string $value) => ucfirst($value));
+        return $this->belongsTo(User::class, 'company_manager_id');
+    }
+
+    public function holidayCompanies()
+    {
+        return $this->hasMany(HolidayCompany::class);
+    }
+
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'holiday_companies');
     }
 }

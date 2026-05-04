@@ -13,12 +13,24 @@ return new class extends Migration
     {
         Schema::table('employees', function (Blueprint $table) {
             // New fields
-            $table->string('full_name')->nullable()->after('id');
-            $table->decimal('basic_salary', 10, 2)->nullable()->after('address');
-            $table->decimal('housing_allowance', 10, 2)->nullable()->after('basic_salary');
-            $table->decimal('transport_allowance', 10, 2)->nullable()->after('housing_allowance');
-            $table->decimal('other_allowances', 10, 2)->nullable()->after('transport_allowance');
-            $table->date('join_date')->nullable()->after('other_allowances');
+            if (!Schema::hasColumn('employees', 'full_name')) {
+                $table->string('full_name')->nullable()->after('id');
+            }
+            if (!Schema::hasColumn('employees', 'basic_salary')) {
+                $table->decimal('basic_salary', 10, 2)->nullable()->after('address');
+            }
+            if (!Schema::hasColumn('employees', 'housing_allowance')) {
+                $table->decimal('housing_allowance', 10, 2)->nullable()->after('basic_salary');
+            }
+            if (!Schema::hasColumn('employees', 'transport_allowance')) {
+                $table->decimal('transport_allowance', 10, 2)->nullable()->after('housing_allowance');
+            }
+            if (!Schema::hasColumn('employees', 'other_allowances')) {
+                $table->decimal('other_allowances', 10, 2)->nullable()->after('transport_allowance');
+            }
+            if (!Schema::hasColumn('employees', 'join_date')) {
+                $table->date('join_date')->nullable()->after('other_allowances');
+            }
 
             // Make old fields nullable
             $table->foreignId('contract_id')->nullable()->change();

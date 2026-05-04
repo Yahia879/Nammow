@@ -203,6 +203,26 @@ class Companies extends Component
                 'is_active' => true,
             ]);
 
+            foreach ($this->managers as $managerData) {
+                $user = User::create([
+                    'name' => $managerData['name'],
+                    'email' => $managerData['email'],
+                    'mobile' => $managerData['phone'] ?: null,
+                    'password' => Hash::make($managerData['password']),
+                    'client_id' => auth()->user()->client_id,
+                    'company_id' => $company->id,
+                ]);
+
+                // Assign role
+                $user->assignRole('company');
+
+                CompanyManager::create([
+                    'company_id' => $company->id,
+                    'user_id' => $user->id,
+                    'status' => 'active',
+                ]);
+            }
+
             DB::commit();
 
             $this->resetInputs();
@@ -258,7 +278,10 @@ class Companies extends Component
                     ]);
 
                     // Assign role
-                    $user->assignRole('company');
+                    $companyRole = \App\Models\Role::where('name', 'company')->first();
+                    if ($companyRole) {
+                        $user->update(['role_id' => $companyRole->id]);
+                    }
 
                     $manager = CompanyManager::create([
                         'user_id' => $user->id,

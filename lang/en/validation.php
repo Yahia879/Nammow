@@ -190,6 +190,15 @@ return [
         'email' => 'Email',
         'phone' => 'Phone',
         'address' => 'Address',
+        'title' => 'title',
+        'start_date' => 'start date',
+        'end_date' => 'end date',
+        'new_leave_type_id' => 'leave type',
+        'new_start_date' => 'start date',
+        'new_end_date' => 'end date',
+        'new_reason' => 'reason',
+        'rejection_reason' => 'rejection reason',
+        'client_id_form' => 'client',
+        'selected_companies' => 'selected companies',
     ],
-
 ];

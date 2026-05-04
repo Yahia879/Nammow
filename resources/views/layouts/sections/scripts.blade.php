@@ -42,12 +42,37 @@
 </script>
 
 <script>
+  window.addEventListener('openModal', event => {
+     $(event.detail.elementId).modal('show');
+  })
   window.addEventListener('closeModal', event => {
      $(event.detail.elementId).modal('hide');
   })
   window.addEventListener('closeCanvas', event => {
      $(event.detail.elementId).offcanvas('hide');
   })
+
+  window.addEventListener('show-delete-confirmation', event => {
+    let data = event.detail;
+    if (data[0]) data = data[0]; // Handle array wrap in some Livewire versions
+
+    Swal.fire({
+      title: data.title ?? 'Are you sure?',
+      text: data.text ?? "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      customClass: {
+        confirmButton: 'btn btn-primary me-1',
+        cancelButton: 'btn btn-label-secondary'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Livewire.dispatch(data.method, { id: data.id });
+      }
+    });
+  });
 </script>
 
 <script>

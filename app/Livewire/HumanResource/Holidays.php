@@ -61,16 +61,16 @@ class Holidays extends Component
         $this->validate();
 
         $holiday = Holiday::create([
-            'name' => $this->name,
-            'from_date' => $this->fromDate,
-            'to_date' => $this->toDate,
-            'note' => $this->note,
+            'title' => $this->name,
+            'start_date' => $this->fromDate,
+            'end_date' => $this->toDate,
+            'description' => $this->note,
+            'client_id' => Auth::user()->client_id,
+            'created_by_type' => Auth::user()->role->name ?? 'company_manager',
+            'scope' => 'selected',
         ]);
 
-        $holiday->centers()->attach($this->centers, [
-            'created_by' => Auth::user()->name,
-            'updated_by' => Auth::user()->name,
-        ]);
+        $holiday->companies()->attach($this->centers);
 
         $this->dispatch('closeModal', elementId: '#holidayModal');
         $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
@@ -81,16 +81,13 @@ class Holidays extends Component
         $this->validate();
 
         $this->holiday->update([
-            'name' => $this->name,
-            'from_date' => $this->fromDate,
-            'to_date' => $this->toDate,
-            'note' => $this->note,
+            'title' => $this->name,
+            'start_date' => $this->fromDate,
+            'end_date' => $this->toDate,
+            'description' => $this->note,
         ]);
 
-        $this->holiday->centers()->syncWithPivotValues($this->centers, [
-            'created_by' => Auth::user()->name,
-            'updated_by' => Auth::user()->name,
-        ]);
+        $this->holiday->companies()->sync($this->centers);
 
         $this->dispatch('closeModal', elementId: '#holidayModal');
         $this->dispatch('toastr', type: 'success' /* , title: 'Done!' */, message: __('Going Well!'));
@@ -119,12 +116,12 @@ class Holidays extends Component
         $this->reset('isEdit', 'name', 'centers', 'fromDate', 'toDate', 'note');
         $this->isEdit = true;
         $this->holiday = $holiday;
-        $this->name = $holiday->name;
-        // $this->center_id = $holiday->centers->pluck('id')->first();
-        $this->centers = $holiday->centers->pluck('id')->toArray();
-        $this->fromDate = $holiday->from_date;
-        $this->toDate = $holiday->to_date;
-        $this->note = $holiday->note;
+        $this->name = $holiday->title;
+        // $this->center_id = $holiday->companies->pluck('id')->first();
+        $this->centers = $holiday->companies->pluck('id')->toArray();
+        $this->fromDate = $holiday->start_date;
+        $this->toDate = $holiday->end_date;
+        $this->note = $holiday->description;
         // $this->dispatchBrowserEvent('openEditHolidayModal');
     }
 }

@@ -47,7 +47,7 @@ class Statistics extends Component
                 $employee->discounts = $employee->discounts->sortBy('date');
                 $employee->cash_discounts_count = $employee->discounts
                     ->filter(function ($discount) {
-                        return $discount->rate > 0;
+                        return $discount->rate > 0 || $discount->amount > 0;
                     })
                     ->count();
             })
