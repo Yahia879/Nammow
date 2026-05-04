@@ -47,6 +47,7 @@
       $isSuperAdmin = auth()->user()->hasRole('super_admin');
       $isClient = auth()->user()->hasRole('client');
       $isCompany = auth()->user()->hasRole('company');
+      $isEmployee = auth()->user()->hasRole('employee');
 
       // HARD WHITELIST FOR CLIENT ROLE
       if ($isClient) {
@@ -55,6 +56,11 @@
       // HARD WHITELIST FOR COMPANY MANAGER ROLE
       elseif ($isCompany) {
         $showItem = true; // Already filtered and ordered
+      }
+      // HARD WHITELIST FOR EMPLOYEE ROLE
+      elseif ($isEmployee) {
+        $allowedEmployeeSlugs = ['employee-dashboard', 'employee-leaves'];
+        $showItem = isset($menu->slug) && in_array($menu->slug, $allowedEmployeeSlugs);
       }
       // HARD WHITELIST FOR SUPER ADMIN (if manifest exists)
       elseif ($isSuperAdmin && file_exists(public_path('mix-manifest.json'))) {

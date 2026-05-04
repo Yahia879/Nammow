@@ -518,6 +518,7 @@
   "Client Dashboard": "لوحة تحكم العميل",
   "Welcome to the Client Dashboard. Manage your companies here.": "أهلاً بك في لوحة تحكم العميل. أدر شركاتك من هنا.",
   "Welcome to the Company Dashboard. Manage your employees here.": "مرحباً بك في لوحة تحكم الشركة، يمكنك إدارة الموظفين من هنا.",
+  "Welcome to the Employee Dashboard. Track your data here.": "مرحباً بك في لوحة تحكم الموظف، يمكنك متابعة بياناتك من هنا.",
   "client.dashboard.breadcrumb.root": "العميل",
   "client.dashboard.breadcrumb.current": "لوحة التحكم",
   "client.company_management": "إدارة الشركات",
